@@ -23,5 +23,6 @@ const Box = styled.div`
 
 export default function Todo() {
   const { id, task } = useLoaderData();
+
   return <Box>{task}</Box>;
 }
