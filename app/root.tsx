@@ -27,6 +27,10 @@ const GlobalStyle = createGlobalStyle`
   html {
     font-size: 62.5%;
   }
+  
+  body {
+    font-size: 2rem;
+  }
 `;
 
 const Header = styled.header`

@@ -1,5 +1,4 @@
 import fs from "fs";
-import invariant from "tiny-invariant";
 
 async function save<T>(key: string, data: T[]): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -34,17 +33,18 @@ export async function getTodos(): Promise<Todo[]> {
   return get<Todo>("todos");
 }
 
-export async function getTodo(task: string): Promise<Todo> {
+export async function getTodo(task: string): Promise<Todo | undefined> {
   const todos = await getTodos();
 
   const todo = todos.find((todo) => task === todo.task);
 
-  invariant(todo, "Todo not found");
-
   return todo;
 }
 
-export async function updateTodo(task: string, todo: Partial<Todo>) {
+export async function updateTodo(
+  task: string,
+  todo: Partial<Todo>
+): Promise<void> {
   const todos = await getTodos();
 
   const todoindex = todos.findIndex((todo) => task === todo.task);

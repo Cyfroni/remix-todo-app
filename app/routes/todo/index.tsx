@@ -1,11 +1,16 @@
 import type { LoaderFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import styled from "styled-components";
-import type { Todo } from "~/models/Todo";
 import { getTodos } from "~/models/Todo";
 
+type LoaderData = {
+  tasks: Awaited<ReturnType<typeof getTodos>>;
+};
+
 export const loader: LoaderFunction = async () => {
-  return getTodos();
+  const todos = await getTodos();
+  return json<LoaderData>({ tasks: todos });
 };
 
 const Box = styled.div`
@@ -18,14 +23,16 @@ const Box = styled.div`
 `;
 
 export default function Index() {
-  const todos = useLoaderData() as Todo[];
+  const { tasks } = useLoaderData() as LoaderData;
 
   return (
     <Box>
       <ul>
-        {todos.map(({ task }) => (
+        {tasks.map(({ task }) => (
           <li key={task}>
-            <Link to={task}>{task}</Link>
+            <Link to={task} prefetch="intent">
+              {task}
+            </Link>
           </li>
         ))}
       </ul>
