@@ -17,8 +17,9 @@ async function get<T>(key: string): Promise<T[]> {
 }
 
 export type Todo = {
-  id: string;
   task: string;
+  description: string;
+  deadline: string;
 };
 
 export async function addTodo(todo: Todo): Promise<void> {
@@ -33,12 +34,27 @@ export async function getTodos(): Promise<Todo[]> {
   return get<Todo>("todos");
 }
 
-export async function getTodo(id: string): Promise<Todo> {
+export async function getTodo(task: string): Promise<Todo> {
   const todos = await getTodos();
 
-  const todo = todos.find((todo) => id === todo.id);
+  const todo = todos.find((todo) => task === todo.task);
 
   invariant(todo, "Todo not found");
 
   return todo;
+}
+
+export async function updateTodo(task: string, todo: Partial<Todo>) {
+  const todos = await getTodos();
+
+  const todoindex = todos.findIndex((todo) => task === todo.task);
+
+  const newTodo = {
+    ...todos[todoindex],
+    ...todo,
+  };
+
+  todos[todoindex] = newTodo;
+
+  save("todos", todos);
 }

@@ -8,18 +8,20 @@ import { addTodo } from "~/models/Todo";
 export const action: ActionFunction = async ({ request }) => {
   const data = await request.formData();
 
-  const id = data.get("id");
   const task = data.get("task");
+  const description = data.get("description");
+  const deadline = data.get("deadline");
 
-  invariant(typeof id === "string", "Id must be a string");
   invariant(typeof task === "string", "Task must be a string");
+  invariant(typeof description === "string", "Description must be a string");
+  invariant(typeof deadline === "string", "Deadline must be a string");
 
-  addTodo({ id, task });
+  addTodo({ task, description, deadline });
 
   return redirect("todo");
 };
 
-const FormStyled = styled(Form)`
+export const FormStyled = styled(Form)`
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -27,9 +29,17 @@ const FormStyled = styled(Form)`
   margin: 0 auto;
   margin-top: 10rem;
 
-  input {
+  font-size: 2rem;
+
+  input,
+  textarea {
     display: block;
     width: 100%;
+  }
+
+  input[readOnly],
+  textarea[readOnly] {
+    border: none;
   }
 
   button {
@@ -41,14 +51,18 @@ export default function New() {
   return (
     <FormStyled method="post">
       <label>
-        Id
-        <input type="text" name="id" />
-      </label>
-      <label>
         Task
         <input type="text" name="task" />
       </label>
-      <button type="submit">submit</button>
+      <label>
+        Description
+        <textarea name="description" cols={30} rows={10}></textarea>
+      </label>
+      <label>
+        Deadline
+        <input type="text" name="deadline" />
+      </label>
+      <button type="submit">Create</button>
     </FormStyled>
   );
 }

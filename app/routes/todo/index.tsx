@@ -23,9 +23,9 @@ export default function Index() {
   return (
     <Box>
       <ul>
-        {todos.map(({ id, task }) => (
-          <li key={id}>
-            <Link to={id}>{task}</Link>
+        {todos.map(({ task }) => (
+          <li key={task}>
+            <Link to={task}>{task}</Link>
           </li>
         ))}
       </ul>
