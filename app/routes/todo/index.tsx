@@ -1,8 +1,9 @@
-import type { LoaderFunction } from "@remix-run/node";
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Form, Link, useLoaderData } from "@remix-run/react";
 import styled from "styled-components";
-import { getTodos } from "~/models/Todo";
+import invariant from "tiny-invariant";
+import { deleteTodo, getTodos } from "~/models/Todo";
 
 type LoaderData = {
   tasks: Awaited<ReturnType<typeof getTodos>>;
@@ -13,6 +14,18 @@ export const loader: LoaderFunction = async () => {
   return json<LoaderData>({ tasks: todos });
 };
 
+export const action: ActionFunction = async ({ request }) => {
+  const data = await request.formData();
+
+  const task = data.get("task");
+
+  invariant(typeof task === "string", "Task must be a string");
+
+  deleteTodo(task);
+
+  return null;
+};
+
 const Box = styled.div`
   display: flex;
   flex-direction: column;
@@ -20,6 +33,17 @@ const Box = styled.div`
   max-width: 50rem;
   margin: 0 auto;
   margin-top: 10rem;
+`;
+
+const FormStyled = styled(Form)`
+  display: inline;
+  margin-left: 1rem;
+  button {
+    background-color: red;
+    border: none;
+    color: white;
+    padding: 1rem;
+  }
 `;
 
 export default function Index() {
@@ -33,6 +57,10 @@ export default function Index() {
             <Link to={task} prefetch="intent">
               {task}
             </Link>
+            <FormStyled method="delete">
+              <input type="text" name="task" hidden readOnly value={task} />
+              <button type="submit">x</button>
+            </FormStyled>
           </li>
         ))}
       </ul>

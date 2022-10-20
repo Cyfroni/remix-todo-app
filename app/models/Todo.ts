@@ -58,3 +58,12 @@ export async function updateTodo(
 
   save("todos", todos);
 }
+
+export async function deleteTodo(task: string) {
+  const todos = await getTodos();
+
+  save(
+    "todos",
+    todos.filter((todo) => task !== todo.task)
+  );
+}
