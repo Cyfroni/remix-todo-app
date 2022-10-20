@@ -1,4 +1,22 @@
 import * as React from "react";
+import { ThemeProvider as TProvider } from "styled-components";
+
 const StylesContext = React.createContext<null | React.ReactNode>(null);
 export const StylesProvider = StylesContext.Provider;
 export const useStyles = () => React.useContext(StylesContext);
+
+const theme = {
+  colors: {
+    main: "#1ba3c6",
+    main_lighter: "#1DB2D7",
+    main_light: "#EDF9FD",
+    secondary: "#43b929",
+    secondary_lighter: "#49C92C",
+    secondary_light: "#F1FBEE",
+    secondary_dark: "#256515",
+  },
+};
+
+export const ThemeProvider = ({ children }: { children: any }): JSX.Element => (
+  <TProvider theme={theme}>{children}</TProvider>
+);

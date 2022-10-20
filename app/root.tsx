@@ -1,6 +1,6 @@
-import { json, LoaderFunction, MetaFunction } from "@remix-run/node";
+import type { LoaderFunction, MetaFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import {
-  Link,
   Links,
   LiveReload,
   Meta,
@@ -9,8 +9,9 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from "@remix-run/react";
-import styled, { createGlobalStyle } from "styled-components";
+import { createGlobalStyle } from "styled-components";
 import { getEnv } from "./env.server";
+import { ThemeProvider } from "./styles-context";
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
@@ -42,6 +43,7 @@ const GlobalStyle = createGlobalStyle`
   
   body {
     font-size: 2rem;
+    background-color: ${({ theme }) => theme.colors.main_light};
   }
 `;
 
@@ -55,8 +57,10 @@ export default function App() {
         {typeof document === "undefined" ? "__STYLES__" : null}
       </head>
       <body>
-        <Outlet />
-        <GlobalStyle />
+        <ThemeProvider>
+          <Outlet />
+          <GlobalStyle />
+        </ThemeProvider>
         <ScrollRestoration />
         <Scripts />
         <script

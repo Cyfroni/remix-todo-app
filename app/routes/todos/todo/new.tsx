@@ -56,10 +56,27 @@ export const FormStyled = styled(Form)`
     margin-left: 1rem;
   }
 
+  label {
+    color: ${({ theme }) => theme.colors.secondary_dark};
+  }
+
   input,
   textarea {
     display: block;
     width: 100%;
+    border-radius: 5px;
+    padding: 5px;
+
+    border: 1px solid ${({ theme }) => theme.colors.secondary};
+    color: ${({ theme }) => theme.colors.secondary_dark};
+
+    background-color: ${({ theme }) => theme.colors.secondary_light};
+  }
+
+  input:focus,
+  textarea:focus {
+    outline: none;
+    box-shadow: 0 0 3px ${({ theme }) => theme.colors.secondary};
   }
 
   input[readOnly],
@@ -69,6 +86,34 @@ export const FormStyled = styled(Form)`
 
   button {
     margin-top: 2rem;
+    background-color: ${({ theme }) => theme.colors.main};
+
+    border: none;
+    border-radius: 20px;
+    padding: 2rem 4rem;
+    color: white;
+
+    font-size: 3rem;
+
+    align-self: center;
+
+    cursor: pointer;
+
+    text-transform: capitalize;
+
+    transition: all 0.3s;
+  }
+
+  button:focus,
+  button:hover {
+    outline: none;
+    box-shadow: 0 0 5px ${({ theme }) => theme.colors.main_lighter};
+    background-color: ${({ theme }) => theme.colors.main_lighter};
+    transform: translateY(-1px);
+  }
+
+  button:active {
+    transform: translateY(1px);
   }
 `;
 
