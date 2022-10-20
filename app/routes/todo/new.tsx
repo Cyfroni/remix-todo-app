@@ -1,7 +1,7 @@
 import type { ActionFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { Form, useActionData } from "@remix-run/react";
+import { Form, useActionData, useTransition } from "@remix-run/react";
 import styled from "styled-components";
 import invariant from "tiny-invariant";
 import { addTodo } from "~/models/Todo";
@@ -74,6 +74,11 @@ export const FormStyled = styled(Form)`
 
 export default function New() {
   const errors = useActionData() as ActionData;
+  const transition = useTransition();
+
+  const isCreating = Boolean(transition.submission);
+
+  console.log(transition);
 
   return (
     <FormStyled method="post">
@@ -92,7 +97,9 @@ export default function New() {
         {errors?.deadline && <em>{errors.deadline}</em>}
         <input type="text" name="deadline" />
       </label>
-      <button type="submit">Create</button>
+      <button type="submit" disabled={isCreating}>
+        {isCreating ? "Creating..." : "Create"}
+      </button>
     </FormStyled>
   );
 }
