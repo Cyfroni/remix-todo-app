@@ -3,7 +3,7 @@ import { json } from "@remix-run/node";
 import { Form, Link, useLoaderData } from "@remix-run/react";
 import styled from "styled-components";
 import invariant from "tiny-invariant";
-import { deleteTodo, getTodos } from "~/models/Todo";
+import { deleteTodo, getTodos } from "~/models/Todo.server";
 // import { addTodo, deleteTodo, getTodo, getTodos } from "~/models/Todo";
 
 type LoaderData = {

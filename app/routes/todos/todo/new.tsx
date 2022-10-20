@@ -4,7 +4,7 @@ import { redirect } from "@remix-run/node";
 import { Form, useActionData, useTransition } from "@remix-run/react";
 import styled from "styled-components";
 import invariant from "tiny-invariant";
-import { addTodo } from "~/models/Todo";
+import { addTodo } from "~/models/Todo.server";
 
 type ActionData =
   | {
@@ -64,7 +64,7 @@ export const FormStyled = styled(Form)`
 
   input[readOnly],
   textarea[readOnly] {
-    border: none;
+    border-color: transparent;
   }
 
   button {

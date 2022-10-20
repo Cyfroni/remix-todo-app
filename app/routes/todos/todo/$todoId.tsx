@@ -10,8 +10,8 @@ import {
 } from "@remix-run/react";
 import { useState } from "react";
 import invariant from "tiny-invariant";
-import type { Todo } from "~/models/Todo";
-import { getTodo, updateTodo } from "~/models/Todo";
+import type { Todo } from "~/models/Todo.server";
+import { getTodo, updateTodo } from "~/models/Todo.server";
 import { FormStyled } from "./new";
 
 type ActionData =

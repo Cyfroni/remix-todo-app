@@ -1,4 +1,4 @@
-import type { MetaFunction } from "@remix-run/node";
+import { json, LoaderFunction, MetaFunction } from "@remix-run/node";
 import {
   Link,
   Links,
@@ -7,14 +7,26 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 import styled, { createGlobalStyle } from "styled-components";
+import { getEnv } from "./env.server";
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
   title: "New Remix App",
   viewport: "width=device-width,initial-scale=1",
 });
+
+type LoaderData = {
+  ENV: ReturnType<typeof getEnv>;
+};
+
+export const loader: LoaderFunction = async ({ request }) => {
+  return json<LoaderData>({
+    ENV: getEnv(),
+  });
+};
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -33,12 +45,8 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-const Header = styled.header`
-  display: flex;
-  gap: 1rem;
-`;
-
 export default function App() {
+  const data = useLoaderData() as LoaderData;
   return (
     <html lang="en">
       <head>
@@ -47,15 +55,15 @@ export default function App() {
         {typeof document === "undefined" ? "__STYLES__" : null}
       </head>
       <body>
-        <Header>
-          <Link to="/">home</Link>
-          <Link to="/todo">todo</Link>
-          <Link to="/todo/new">todonew</Link>
-        </Header>
         <Outlet />
         <GlobalStyle />
         <ScrollRestoration />
         <Scripts />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(data.ENV)}`,
+          }}
+        />
         <LiveReload />
       </body>
     </html>

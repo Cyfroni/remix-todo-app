@@ -67,3 +67,9 @@ export async function deleteTodo(task: string) {
     todos.filter((todo) => task !== todo.task)
   );
 }
+
+export async function duplicateTodo(task: string) {
+  const todo = await getTodo(task);
+
+  addTodo(todo!);
+}
