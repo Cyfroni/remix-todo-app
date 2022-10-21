@@ -68,8 +68,12 @@ export async function deleteTodo(task: string) {
   );
 }
 
-export async function duplicateTodo(task: string) {
-  const todo = await getTodo(task);
+// export async function duplicateTodo(task: string) {
+//   const todo = await getTodo(task);
 
-  addTodo(todo!);
+//   addTodo(todo!);
+// }
+
+export async function removeAll() {
+  save("todos", []);
 }

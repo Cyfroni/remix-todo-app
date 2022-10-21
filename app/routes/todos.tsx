@@ -16,7 +16,9 @@ const Header = styled.header`
 
     transition: all 0.3s;
 
+    &:focus,
     &:hover {
+      outline: none;
       background-color: ${({ theme }) => theme.colors.main_lighter};
     }
   }

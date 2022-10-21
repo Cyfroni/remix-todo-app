@@ -65,6 +65,13 @@ const Box = styled.div`
 
       background-color: ${({ theme }) => theme.colors.main};
       transition: all 0.3s;
+
+      &:focus,
+      &:hover {
+        outline: none;
+        box-shadow: 0 0 5px ${({ theme }) => theme.colors.main_lighter};
+      }
+
       &:hover {
         background-color: ${({ theme }) => theme.colors.main_lighter};
       }
@@ -84,7 +91,9 @@ const FormStyled = styled(Form)`
 
     display: block;
     height: 100%;
-    border-radius: 50%;
+    border-bottom: 1px solid transparent;
+
+    transition: all 0.3s;
 
     cursor: pointer;
 
@@ -92,6 +101,11 @@ const FormStyled = styled(Form)`
 
     &:hover {
       color: ${({ theme }) => theme.colors.error_lighter};
+    }
+
+    &:focus {
+      outline: none;
+      border-bottom: 1px solid ${({ theme }) => theme.colors.error_lighter};
     }
 
     svg {
@@ -103,6 +117,10 @@ const FormStyled = styled(Form)`
 
     &:hover {
       color: #737641;
+    }
+
+    &:focus {
+      border-bottom: 1px solid #737641;
     }
   }
 `;

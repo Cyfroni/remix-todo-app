@@ -11,6 +11,7 @@ const theme = {
     main: "#1ba3c6",
     main_lighter: "#1DB2D7",
     main_light: "#EDF9FD",
+    main_dark: "#0A3B48",
     secondary: "#43b929",
     secondary_lighter: "#49C92C",
     secondary_light: "#F1FBEE",

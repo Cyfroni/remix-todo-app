@@ -30,6 +30,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 const GlobalStyle = createGlobalStyle`
+
+  :root {
+    font-family: 'Fuzzy Bubbles', cursive;
+  }
+
   * {
     margin: 0;
     padding: 0;
@@ -44,6 +49,11 @@ const GlobalStyle = createGlobalStyle`
   body {
     font-size: 2rem;
     background-color: ${({ theme }) => theme.colors.main_light};
+    color: ${({ theme }) => theme.colors.main_dark};
+  }
+
+  input, textarea, button {
+    font-family: inherit;
   }
 `;
 
@@ -54,6 +64,16 @@ export default function App() {
       <head>
         <Meta />
         <Links />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="true"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Fuzzy+Bubbles:wght@400;700&display=swap"
+          rel="stylesheet"
+        />
         {typeof document === "undefined" ? "__STYLES__" : null}
       </head>
       <body>

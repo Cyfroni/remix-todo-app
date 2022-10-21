@@ -51,7 +51,7 @@ export const FormStyled = styled(Form)`
   font-size: 2rem;
 
   em {
-    color: red;
+    color: ${({ theme }) => theme.colors.error};
     font-size: 1.2rem;
     margin-left: 1rem;
   }
@@ -111,8 +111,16 @@ export const ButtonStyled = styled.button<{ primary?: Boolean }>`
   &:hover {
     outline: none;
     box-shadow: 0 0 5px ${({ theme }) => theme.colors.main_lighter};
-    background-color: ${({ theme }) => theme.colors.main_lighter};
     color: white;
+  }
+
+  &:focus {
+    color: ${({ primary, theme }) =>
+      primary ? "white" : theme.colors.main_lighter};
+  }
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.main_lighter};
     transform: translateY(-1px);
   }
 

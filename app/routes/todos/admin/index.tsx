@@ -1,19 +1,64 @@
+import type { ActionFunction } from "@remix-run/node";
+import { Form, useTransition } from "@remix-run/react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
+import invariant from "tiny-invariant";
+import { removeAll } from "~/models/Todo.server";
+import { ButtonStyled } from "../todo/new";
+
+export const action: ActionFunction = ({ request }) => {
+  invariant(process.env.ADMIN === "true", "You're not an admin");
+
+  removeAll();
+
+  return null;
+};
 
 const Box = styled.div`
-  font-family: system-ui, sans-serif;
   line-height: 1.4;
   text-align: center;
+  margin-top: 5rem;
+`;
 
-  h1 {
-    box-shadow: 0 1px 2px black;
+const DeleteButton = styled(ButtonStyled)`
+  background-color: ${({ theme }) => theme.colors.error};
+  border: transparent;
+
+  &:focus,
+  &:hover {
+    box-shadow: 0 0 5px ${({ theme }) => theme.colors.error_lighter};
+  }
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.error_lighter};
   }
 `;
 
+const DeletedText = styled.div`
+  margin-top: 2rem;
+  font-size: 3rem;
+`;
+
 export default function Index() {
+  const [deleted, setDeleted] = useState(false);
+  const transition = useTransition();
+
+  useEffect(() => {
+    if (transition.state === "loading") setDeleted(true);
+  }, [transition]);
+
   return (
     <Box>
-      <h1>Hello admin</h1>
+      <h1>What's up admin?</h1>
+      {deleted ? (
+        <DeletedText>Deleted! 🥳</DeletedText>
+      ) : (
+        <Form method="delete">
+          <DeleteButton type="submit" primary>
+            delete all 😱
+          </DeleteButton>
+        </Form>
+      )}
     </Box>
   );
 }
