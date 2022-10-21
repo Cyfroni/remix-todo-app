@@ -1,9 +1,12 @@
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, Link, useLoaderData } from "@remix-run/react";
 import styled from "styled-components";
 import invariant from "tiny-invariant";
 import { deleteTodo, getTodos } from "~/models/Todo.server";
+// import { faTrash, faCopy } from "@fortawesome/free-solid-svg-icons";
 // import { addTodo, deleteTodo, getTodo, getTodos } from "~/models/Todo";
 
 type LoaderData = {
@@ -43,19 +46,64 @@ const Box = styled.div`
   max-width: 50rem;
   margin: 0 auto;
   margin-top: 10rem;
+
+  ul {
+    list-style: none;
+
+    li {
+      display: flex;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    a {
+      flex: 1;
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+
+      background-color: ${({ theme }) => theme.colors.main};
+      transition: all 0.3s;
+      &:hover {
+        background-color: ${({ theme }) => theme.colors.main_lighter};
+      }
+    }
+  }
 `;
 
 const FormStyled = styled(Form)`
-  display: inline;
+  display: flex;
+  align-self: stretch;
   button {
-    margin: 0.5rem;
-    background-color: red;
+    background-color: transparent;
     border: none;
     color: white;
-    padding: 1rem;
+    margin: 0 0.5rem;
+    padding: 0.5rem 0;
+
+    display: block;
+    height: 100%;
+    border-radius: 50%;
+
+    cursor: pointer;
+
+    color: ${({ theme }) => theme.colors.error};
+
+    &:hover {
+      color: ${({ theme }) => theme.colors.error_lighter};
+    }
+
+    svg {
+      height: 100%;
+    }
   }
   button[value="duplicate"] {
-    background-color: blue;
+    color: #656839;
+
+    &:hover {
+      color: #737641;
+    }
   }
 `;
 
@@ -64,20 +112,23 @@ export default function Index() {
 
   return (
     <Box>
+      <h1>{tasks.length > 0 ? "Things you should do:" : "Nothing to do ⛱"}</h1>
       <ul>
         {tasks.map(({ task }) => (
           <li key={task}>
-            <Link to={task} prefetch="intent">
+            <Link to={`todo/${task}`} prefetch="intent">
               {task}
             </Link>
             <FormStyled method="delete">
               <input type="text" name="task" hidden readOnly value={task} />
-              <button type="submit">x</button>
+              <button type="submit">
+                <FontAwesomeIcon icon={faTrash} />
+              </button>
               {/* <button type="submit" name="intent" value="delete">
-                x
-              </button> */}
-              {/* <button type="submit" name="intent" value="duplicate">
-                duplicate
+                <FontAwesomeIcon icon={faTrash} />
+              </button>
+              <button type="submit" name="intent" value="duplicate">
+                <FontAwesomeIcon icon={faCopy} />
               </button> */}
             </FormStyled>
           </li>

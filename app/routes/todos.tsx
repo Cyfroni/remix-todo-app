@@ -27,8 +27,8 @@ export default function Index() {
     <>
       <Header>
         <Link to="/">home</Link>
-        <Link to="todo">todo</Link>
-        <Link to="todo/new">todonew</Link>
+        <Link to=".">todos</Link>
+        <Link to="todo/new">create todo</Link>
         {ENV.ADMIN === "true" && <Link to="admin">admin</Link>}
       </Header>
       <Outlet />

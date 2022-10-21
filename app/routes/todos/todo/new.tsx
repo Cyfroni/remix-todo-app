@@ -37,7 +37,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   addTodo({ task, description, deadline });
 
-  return redirect("todo");
+  return redirect("todos");
 };
 
 export const FormStyled = styled(Form)`
@@ -81,38 +81,42 @@ export const FormStyled = styled(Form)`
 
   input[readOnly],
   textarea[readOnly] {
-    border-color: transparent;
+    border-color: #ddd;
   }
+`;
 
-  button {
-    margin-top: 2rem;
-    background-color: ${({ theme }) => theme.colors.main};
+export const ButtonStyled = styled.button<{ primary?: Boolean }>`
+  margin-top: 2rem;
+  background-color: ${({ primary, theme }) =>
+    primary ? theme.colors.main : "white"};
 
-    border: none;
-    border-radius: 20px;
-    padding: 2rem 4rem;
-    color: white;
+  border: 1px solid ${({ theme }) => theme.colors.main};
+  border-radius: 20px;
+  padding: 2rem 4rem;
+  color: ${({ primary, theme }) => (primary ? "white" : theme.colors.main)};
 
-    font-size: 3rem;
+  font-size: 3rem;
 
-    align-self: center;
+  align-self: center;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    text-transform: capitalize;
+  text-transform: capitalize;
 
-    transition: all 0.3s;
-  }
+  transition: all 0.3s;
 
-  button:focus,
-  button:hover {
+  width: 20rem;
+
+  &:focus,
+  &:hover {
     outline: none;
     box-shadow: 0 0 5px ${({ theme }) => theme.colors.main_lighter};
     background-color: ${({ theme }) => theme.colors.main_lighter};
+    color: white;
     transform: translateY(-1px);
   }
 
-  button:active {
+  &:active {
     transform: translateY(1px);
   }
 `;
@@ -142,9 +146,9 @@ export default function New() {
         {errors?.deadline && <em>{errors.deadline}</em>}
         <input type="text" name="deadline" />
       </label>
-      <button type="submit" disabled={isCreating}>
+      <ButtonStyled type="submit" disabled={isCreating} primary>
         {isCreating ? "Creating..." : "Create"}
-      </button>
+      </ButtonStyled>
     </FormStyled>
   );
 }

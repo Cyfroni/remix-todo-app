@@ -9,10 +9,11 @@ import {
   useParams,
 } from "@remix-run/react";
 import { useState } from "react";
+import styled from "styled-components";
 import invariant from "tiny-invariant";
 import type { Todo } from "~/models/Todo.server";
 import { getTodo, updateTodo } from "~/models/Todo.server";
-import { FormStyled } from "./new";
+import { ButtonStyled, FormStyled } from "./new";
 
 type ActionData =
   | {
@@ -39,7 +40,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   updateTodo(task, { description });
 
-  return redirect("todo");
+  return redirect("todos");
 };
 
 type LoaderData = Todo;
@@ -55,6 +56,11 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   return json<LoaderData>(todo);
 };
+
+const ButtonsWrapper = styled.div`
+  display: flex;
+  justify-content: space-around;
+`;
 
 export default function TodoRoute() {
   const { task, description, deadline } = useLoaderData() as LoaderData;
@@ -82,9 +88,21 @@ export default function TodoRoute() {
         Deadline
         <input type="text" name="deadline" readOnly defaultValue={deadline} />
       </label>
-      {!editing && <button onClick={() => setEditing(true)}>edit</button>}
-      {editing && <button onClick={() => setEditing(false)}>cancel</button>}
-      {editing && <button type="submit">save</button>}
+      <ButtonsWrapper>
+        {!editing && (
+          <ButtonStyled primary onClick={() => setEditing(true)}>
+            edit
+          </ButtonStyled>
+        )}
+        {editing && (
+          <ButtonStyled onClick={() => setEditing(false)}>cancel</ButtonStyled>
+        )}
+        {editing && (
+          <ButtonStyled primary type="submit">
+            save
+          </ButtonStyled>
+        )}
+      </ButtonsWrapper>
     </FormStyled>
   );
 }

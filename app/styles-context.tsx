@@ -1,5 +1,6 @@
 import * as React from "react";
 import { ThemeProvider as TProvider } from "styled-components";
+// import {} from "styled-components/cssprop";
 
 const StylesContext = React.createContext<null | React.ReactNode>(null);
 export const StylesProvider = StylesContext.Provider;
@@ -14,6 +15,8 @@ const theme = {
     secondary_lighter: "#49C92C",
     secondary_light: "#F1FBEE",
     secondary_dark: "#256515",
+    error: "#F93943",
+    error_lighter: "#F94D56",
   },
 };
 
