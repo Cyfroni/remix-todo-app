@@ -78,8 +78,7 @@ export default function TodoRoute() {
         {errors?.description && <em>{errors.description}</em>}
         <textarea
           name="description"
-          // cols={30}
-          // rows={10}
+          rows={5}
           readOnly={!editing}
           defaultValue={description}
         ></textarea>

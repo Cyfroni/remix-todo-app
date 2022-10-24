@@ -1,13 +1,11 @@
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, Link, useLoaderData } from "@remix-run/react";
 import styled from "styled-components";
 import invariant from "tiny-invariant";
-import { deleteTodo, getTodos } from "~/models/Todo.server";
-// import { faTrash, faCopy } from "@fortawesome/free-solid-svg-icons";
-// import { addTodo, deleteTodo, getTodo, getTodos } from "~/models/Todo";
+import { faTrash, faCopy } from "@fortawesome/free-solid-svg-icons";
+import { addTodo, deleteTodo, getTodo, getTodos } from "~/models/Todo.server";
 
 type LoaderData = {
   tasks: Awaited<ReturnType<typeof getTodos>>;
@@ -25,16 +23,17 @@ export const action: ActionFunction = async ({ request }) => {
 
   invariant(typeof task === "string", "Task must be a string");
 
-  // const intent = data.get("intent");
+  const intent = data.get("intent");
 
-  deleteTodo(task);
-
-  // if (intent === "delete") deleteTodo(task);
-  // if (intent === "duplicate") {
-  //   const todo = await getTodo(task);
-  //   invariant(todo, "Todo is required");
-  //   await addTodo(todo);
-  // }
+  if (intent === "delete") deleteTodo(task);
+  if (intent === "duplicate") {
+    const todo = await getTodo(task);
+    invariant(todo, "Todo is required");
+    await addTodo({
+      ...todo,
+      task: todo.task + " - Copy",
+    });
+  }
 
   return null;
 };
@@ -45,7 +44,7 @@ const Box = styled.div`
   gap: 1rem;
   max-width: 50rem;
   margin: 0 auto;
-  margin-top: 10rem;
+  margin-top: 5rem;
 
   ul {
     list-style: none;
@@ -60,8 +59,12 @@ const Box = styled.div`
       flex: 1;
       color: white;
       text-decoration: none;
-      padding: 0.5rem 1rem;
+      padding: 1rem 2rem;
       border-radius: 5px;
+
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
       background-color: ${({ theme }) => theme.colors.main};
       transition: all 0.3s;
@@ -80,18 +83,19 @@ const Box = styled.div`
 `;
 
 const FormStyled = styled(Form)`
+  margin-left: 1rem;
   display: flex;
-  align-self: stretch;
   button {
     background-color: transparent;
     border: none;
     color: white;
-    margin: 0 0.5rem;
-    padding: 0.5rem 0;
+    padding: 0.25rem 0;
 
     display: block;
-    height: 100%;
     border-bottom: 1px solid transparent;
+
+    height: 3.5rem;
+    width: 3.5rem;
 
     transition: all 0.3s;
 
@@ -132,22 +136,20 @@ export default function Index() {
     <Box>
       <h1>{tasks.length > 0 ? "Things you should do:" : "Nothing to do ⛱"}</h1>
       <ul>
-        {tasks.map(({ task }) => (
+        {tasks.map(({ task }, index) => (
           <li key={task}>
-            <Link to={`todo/${task}`} prefetch="intent">
-              {task}
+            {/* <Link to={`todo/${task}`} prefetch="intent"> */}
+            <Link to={`todo/${task}`}>
+              {index + 1}. {task}
             </Link>
             <FormStyled method="delete">
-              <input type="text" name="task" hidden readOnly value={task} />
-              <button type="submit">
-                <FontAwesomeIcon icon={faTrash} />
-              </button>
-              {/* <button type="submit" name="intent" value="delete">
+              <input type="hidden" name="task" value={task} />
+              <button type="submit" name="intent" value="delete">
                 <FontAwesomeIcon icon={faTrash} />
               </button>
               <button type="submit" name="intent" value="duplicate">
                 <FontAwesomeIcon icon={faCopy} />
-              </button> */}
+              </button>
             </FormStyled>
           </li>
         ))}

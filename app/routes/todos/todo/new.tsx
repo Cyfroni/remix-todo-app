@@ -2,6 +2,7 @@ import type { ActionFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, useActionData, useTransition } from "@remix-run/react";
+import { FidgetSpinner } from "react-loader-spinner";
 import styled from "styled-components";
 import invariant from "tiny-invariant";
 import { addTodo } from "~/models/Todo.server";
@@ -43,12 +44,12 @@ export const action: ActionFunction = async ({ request }) => {
 export const FormStyled = styled(Form)`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
   max-width: 50rem;
   margin: 0 auto;
   margin-top: 10rem;
 
-  font-size: 2rem;
+  font-size: 2.5rem;
 
   em {
     color: ${({ theme }) => theme.colors.error};
@@ -71,6 +72,8 @@ export const FormStyled = styled(Form)`
     color: ${({ theme }) => theme.colors.secondary_dark};
 
     background-color: ${({ theme }) => theme.colors.secondary_light};
+
+    font-size: 2rem;
   }
 
   input:focus,
@@ -86,7 +89,6 @@ export const FormStyled = styled(Form)`
 `;
 
 export const ButtonStyled = styled.button<{ primary?: Boolean }>`
-  margin-top: 2rem;
   background-color: ${({ primary, theme }) =>
     primary ? theme.colors.main : "white"};
 
@@ -129,6 +131,23 @@ export const ButtonStyled = styled.button<{ primary?: Boolean }>`
   }
 `;
 
+const FooterStyled = styled.footer`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 2rem;
+
+  svg {
+    position: absolute;
+    z-index: 100;
+  }
+
+  button[disabled] {
+    color: transparent;
+  }
+`;
+
 export default function New() {
   const errors = useActionData() as ActionData;
   const transition = useTransition();
@@ -147,16 +166,28 @@ export default function New() {
       <label>
         Description
         {errors?.description && <em>{errors.description}</em>}
-        <textarea name="description" cols={30} rows={10}></textarea>
+        <textarea name="description" rows={5}></textarea>
       </label>
       <label>
         Deadline
         {errors?.deadline && <em>{errors.deadline}</em>}
         <input type="text" name="deadline" />
       </label>
-      <ButtonStyled type="submit" disabled={isCreating} primary>
-        {isCreating ? "Creating..." : "Create"}
-      </ButtonStyled>
+      <FooterStyled>
+        <FidgetSpinner
+          visible={isCreating}
+          height="70"
+          width="70"
+          ariaLabel="dna-loading"
+          wrapperStyle={{}}
+          wrapperClass="dna-wrapper"
+          ballColors={["transparent", "transparent", "transparent"]}
+          backgroundColor="white"
+        />
+        <ButtonStyled type="submit" disabled={isCreating} primary>
+          Create
+        </ButtonStyled>
+      </FooterStyled>
     </FormStyled>
   );
 }
