@@ -7,13 +7,14 @@ import {
   useCatch,
   useLoaderData,
   useParams,
+  useTransition,
 } from "@remix-run/react";
 import { useState } from "react";
 import styled from "styled-components";
 import invariant from "tiny-invariant";
 import type { Todo } from "~/models/Todo.server";
 import { getTodo, updateTodo } from "~/models/Todo.server";
-import { ButtonStyled, FormStyled } from "./new";
+import { ButtonStyled, FormStyled, SubmitButtonWithLoader } from "./new";
 
 type ActionData =
   | {
@@ -57,15 +58,21 @@ export const loader: LoaderFunction = async ({ params }) => {
   return json<LoaderData>(todo);
 };
 
-const ButtonsWrapper = styled.div`
+const ButtonsWrapper = styled.fieldset`
   display: flex;
   justify-content: space-around;
+  border: none;
+
+  margin-top: 2rem;
 `;
 
 export default function TodoRoute() {
   const { task, description, deadline } = useLoaderData() as LoaderData;
   const errors = useActionData() as ActionData;
+  const transition = useTransition();
   const [editing, setEditing] = useState(false);
+
+  const isSubmitting = Boolean(transition.submission);
 
   return (
     <FormStyled method="put">
@@ -87,7 +94,7 @@ export default function TodoRoute() {
         Deadline
         <input type="text" name="deadline" readOnly defaultValue={deadline} />
       </label>
-      <ButtonsWrapper>
+      <ButtonsWrapper disabled={isSubmitting}>
         {!editing && (
           <ButtonStyled primary onClick={() => setEditing(true)}>
             edit
@@ -97,9 +104,7 @@ export default function TodoRoute() {
           <ButtonStyled onClick={() => setEditing(false)}>cancel</ButtonStyled>
         )}
         {editing && (
-          <ButtonStyled primary type="submit">
-            save
-          </ButtonStyled>
+          <SubmitButtonWithLoader loading={isSubmitting} label="save" />
         )}
       </ButtonsWrapper>
     </FormStyled>

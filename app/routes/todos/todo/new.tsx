@@ -84,11 +84,11 @@ export const FormStyled = styled(Form)`
 
   input[readOnly],
   textarea[readOnly] {
-    border-color: #ddd;
+    border-color: ${({ theme }) => theme.colors.grey_light};
   }
 `;
 
-export const ButtonStyled = styled.button<{ primary?: Boolean }>`
+export const ButtonStyled = styled.button<{ primary?: boolean }>`
   background-color: ${({ primary, theme }) =>
     primary ? theme.colors.main : "white"};
 
@@ -101,42 +101,49 @@ export const ButtonStyled = styled.button<{ primary?: Boolean }>`
 
   align-self: center;
 
-  cursor: pointer;
-
   text-transform: capitalize;
-
-  transition: all 0.3s;
 
   width: 20rem;
 
-  &:focus,
-  &:hover {
-    outline: none;
-    box-shadow: 0 0 5px ${({ theme }) => theme.colors.main_lighter};
-    color: white;
+  transition: all 0.3s, color 0s;
+
+  &:disabled {
+    border: 1px solid
+      ${({ primary, theme }) =>
+        primary ? theme.colors.main : theme.colors.grey};
+    color: ${({ primary, theme }) => (primary ? "white" : theme.colors.grey)};
   }
 
-  &:focus {
-    color: ${({ primary, theme }) =>
-      primary ? "white" : theme.colors.main_lighter};
-  }
+  &:not(:disabled) {
+    cursor: pointer;
 
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.main_lighter};
-    transform: translateY(-1px);
-  }
+    &:focus,
+    &:hover {
+      outline: none;
+      box-shadow: 0 0 5px ${({ theme }) => theme.colors.main_lighter};
+      color: white;
+    }
 
-  &:active {
-    transform: translateY(1px);
+    &:focus {
+      color: ${({ primary, theme }) =>
+        primary ? "white" : theme.colors.main_lighter};
+    }
+
+    &:hover {
+      background-color: ${({ theme }) => theme.colors.main_lighter};
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
   }
 `;
 
-const FooterStyled = styled.footer`
+const ButtonWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-
-  margin-top: 2rem;
 
   svg {
     position: absolute;
@@ -148,13 +155,43 @@ const FooterStyled = styled.footer`
   }
 `;
 
+export function SubmitButtonWithLoader({
+  loading,
+  label,
+  className,
+}: {
+  loading: boolean;
+  label: string;
+  className?: string;
+}) {
+  return (
+    <ButtonWrapper className={className}>
+      <FidgetSpinner
+        visible={loading}
+        height="70"
+        width="70"
+        ariaLabel="dna-loading"
+        wrapperStyle={{}}
+        wrapperClass="dna-wrapper"
+        ballColors={["transparent", "transparent", "transparent"]}
+        backgroundColor="white"
+      />
+      <ButtonStyled type="submit" disabled={loading} primary>
+        {label}
+      </ButtonStyled>
+    </ButtonWrapper>
+  );
+}
+
+const SubmitButtonWithLoaderStyled = styled(SubmitButtonWithLoader)`
+  margin-top: 2rem;
+`;
+
 export default function New() {
   const errors = useActionData() as ActionData;
   const transition = useTransition();
 
-  const isCreating = Boolean(transition.submission);
-
-  console.log(transition);
+  const isSubmitting = Boolean(transition.submission);
 
   return (
     <FormStyled method="post">
@@ -173,21 +210,7 @@ export default function New() {
         {errors?.deadline && <em>{errors.deadline}</em>}
         <input type="text" name="deadline" />
       </label>
-      <FooterStyled>
-        <FidgetSpinner
-          visible={isCreating}
-          height="70"
-          width="70"
-          ariaLabel="dna-loading"
-          wrapperStyle={{}}
-          wrapperClass="dna-wrapper"
-          ballColors={["transparent", "transparent", "transparent"]}
-          backgroundColor="white"
-        />
-        <ButtonStyled type="submit" disabled={isCreating} primary>
-          Create
-        </ButtonStyled>
-      </FooterStyled>
+      <SubmitButtonWithLoaderStyled loading={isSubmitting} label="Create" />
     </FormStyled>
   );
 }

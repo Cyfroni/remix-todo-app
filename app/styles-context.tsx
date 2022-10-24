@@ -12,12 +12,17 @@ const theme = {
     main_lighter: "#1DB2D7",
     main_light: "#EDF9FD",
     main_dark: "#0A3B48",
+
     secondary: "#43b929",
     secondary_lighter: "#49C92C",
     secondary_light: "#F1FBEE",
     secondary_dark: "#256515",
+
     error: "#F93943",
     error_lighter: "#F94D56",
+
+    grey: "#aaa",
+    grey_light: "#ddd",
   },
 };
 
