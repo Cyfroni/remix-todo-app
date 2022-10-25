@@ -23,14 +23,15 @@ const Box = styled.div`
 const DeleteButton = styled(ButtonStyled)`
   background-color: ${({ theme }) => theme.colors.error};
   border: transparent;
+  &:not(:disabled) {
+    &:focus,
+    &:hover {
+      box-shadow: 0 0 5px ${({ theme }) => theme.colors.error_lighter};
+    }
 
-  &:focus,
-  &:hover {
-    box-shadow: 0 0 5px ${({ theme }) => theme.colors.error_lighter};
-  }
-
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.error_lighter};
+    &:hover {
+      background-color: ${({ theme }) => theme.colors.error_lighter};
+    }
   }
 `;
 

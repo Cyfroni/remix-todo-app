@@ -1,5 +1,9 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import type {
+  ActionFunction,
+  HeadersFunction,
+  LoaderFunction,
+} from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, Link, useLoaderData } from "@remix-run/react";
 import styled from "styled-components";
@@ -7,13 +11,23 @@ import invariant from "tiny-invariant";
 import { faTrash, faCopy } from "@fortawesome/free-solid-svg-icons";
 import { addTodo, deleteTodo, getTodo, getTodos } from "~/models/Todo.server";
 
+export const headers: HeadersFunction = ({ loaderHeaders }) => {
+  return {
+    // "Cache-Control": `public, max-age=20`,
+    // "Cache-Control": `no-cache, no-store, must-revalidate`,
+  };
+};
+
 type LoaderData = {
   tasks: Awaited<ReturnType<typeof getTodos>>;
 };
 
 export const loader: LoaderFunction = async () => {
   const todos = await getTodos();
-  return json<LoaderData>({ tasks: todos });
+  return json<LoaderData>(
+    { tasks: todos }
+    // { headers: { "Cache-Control": "public, max-age=100" } }
+  );
 };
 
 export const action: ActionFunction = async ({ request }) => {
