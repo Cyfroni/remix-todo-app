@@ -1,3 +1,4 @@
+import { faCopy, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type {
   ActionFunction,
@@ -8,7 +9,6 @@ import { json } from "@remix-run/node";
 import { Form, Link, useLoaderData } from "@remix-run/react";
 import styled from "styled-components";
 import invariant from "tiny-invariant";
-import { faTrash, faCopy } from "@fortawesome/free-solid-svg-icons";
 import { addTodo, deleteTodo, getTodo, getTodos } from "~/models/Todo.server";
 
 export const headers: HeadersFunction = ({ loaderHeaders }) => {
@@ -26,7 +26,7 @@ export const loader: LoaderFunction = async () => {
   const todos = await getTodos();
   return json<LoaderData>(
     { tasks: todos }
-    // { headers: { "Cache-Control": "public, max-age=100" } }
+    // { headers: { "Cache-Control": "public, max-age=10" } }
   );
 };
 

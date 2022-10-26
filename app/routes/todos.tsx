@@ -1,8 +1,21 @@
-import { Link, Outlet } from "@remix-run/react";
+import type { LoaderFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import styled from "styled-components";
+import { getTodos } from "~/models/Todo.server";
+
+// type LoaderData = {
+//   amount: number;
+// };
+
+// export const loader: LoaderFunction = async () => {
+//   const todos = await getTodos();
+//   return json<LoaderData>({ amount: todos.length });
+// };
 
 const Header = styled.header`
   display: flex;
+  align-items: center;
   gap: 1rem;
 
   padding-left: 1rem;
@@ -24,7 +37,24 @@ const Header = styled.header`
   }
 `;
 
+const Number = styled.div`
+  color: ${({ theme }) => theme.colors.main_dark};
+  background-color: ${({ theme }) => theme.colors.main_light};
+
+  height: 3rem;
+  width: 3rem;
+  border-radius: 50%;
+  padding: 0.5rem;
+
+  text-align: center;
+
+  margin-left: auto;
+  margin-right: 1rem;
+`;
+
 export default function Index() {
+  // const { amount } = useLoaderData() as LoaderData;
+
   return (
     <>
       <Header>
@@ -32,6 +62,7 @@ export default function Index() {
         <Link to=".">todos</Link>
         <Link to="todo/new">create todo</Link>
         {ENV.ADMIN === "true" && <Link to="admin">admin</Link>}
+        {/* <Number>{amount}</Number> */}
       </Header>
       <Outlet />
     </>

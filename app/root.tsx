@@ -9,6 +9,7 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from "@remix-run/react";
+import React from "react";
 import { createGlobalStyle } from "styled-components";
 import { getEnv } from "./env.server";
 import { ThemeProvider } from "./styles-context";
@@ -57,7 +58,7 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-export default function App() {
+function Document({ children }: { children: React.ReactNode }) {
   const data = useLoaderData() as LoaderData;
   return (
     <html lang="en">
@@ -78,14 +79,14 @@ export default function App() {
       </head>
       <body>
         <ThemeProvider>
-          <Outlet />
+          {children}
           <GlobalStyle />
         </ThemeProvider>
         <ScrollRestoration />
         <Scripts />
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(data.ENV)}`,
+            __html: `window.ENV = ${JSON.stringify(data?.ENV)}`,
           }}
         />
         <LiveReload />
@@ -93,3 +94,27 @@ export default function App() {
     </html>
   );
 }
+
+export default function App() {
+  return (
+    <Document>
+      <Outlet />
+    </Document>
+  );
+}
+
+// export function CatchBoundary() {
+//   return (
+//     <Document>
+//       <div>Got u covered!</div>
+//     </Document>
+//   );
+// }
+
+// export function ErrorBoundary({ error }: { error: Error }) {
+//   return (
+//     <Document>
+//       <div>Whooops! {error.message}</div>;
+//     </Document>
+//   );
+// }

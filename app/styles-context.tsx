@@ -1,6 +1,5 @@
 import * as React from "react";
 import { ThemeProvider as TProvider } from "styled-components";
-// import {} from "styled-components/cssprop";
 
 const StylesContext = React.createContext<null | React.ReactNode>(null);
 export const StylesProvider = StylesContext.Provider;
@@ -20,6 +19,7 @@ const theme = {
 
     error: "#F93943",
     error_lighter: "#F94D56",
+    error_light: "#FEEBEC",
 
     grey: "#aaa",
     grey_light: "#ddd",
