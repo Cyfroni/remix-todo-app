@@ -29,7 +29,7 @@ type ActionData =
 export const action: ActionFunction = async ({ request }) => {
   const data = await request.formData();
 
-  const task = data.get("task");
+  const id = data.get("id");
   const description = data.get("description");
 
   const errors = {
@@ -40,10 +40,10 @@ export const action: ActionFunction = async ({ request }) => {
     return json<ActionData>(errors);
   }
 
-  invariant(typeof task === "string", "Task must be a string");
+  invariant(typeof id === "string", "Id must be a string");
   invariant(typeof description === "string", "Description must be a string");
 
-  updateTodo(task, { description });
+  updateTodo(id, { description });
 
   return redirect("todos");
 };
@@ -71,7 +71,7 @@ const ButtonsWrapper = styled.fieldset`
 `;
 
 export default function TodoRoute() {
-  const { task, description, deadline } = useLoaderData() as LoaderData;
+  const { id, task, description, deadline } = useLoaderData() as LoaderData;
   const errors = useActionData() as ActionData;
   const transition = useTransition();
   const [editing, setEditing] = useState(false);
@@ -80,6 +80,7 @@ export default function TodoRoute() {
 
   return (
     <FormStyled method="put">
+      <input type="hidden" name="id" value={id} />
       <label>
         Task
         <input type="text" name="task" readOnly defaultValue={task} />

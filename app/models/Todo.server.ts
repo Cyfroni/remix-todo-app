@@ -16,6 +16,7 @@ async function get<T>(key: string): Promise<T[]> {
 }
 
 export type Todo = {
+  id: string;
   task: string;
   description: string;
   deadline: string;
@@ -33,21 +34,21 @@ export async function getTodos(): Promise<Todo[]> {
   return get<Todo>("todos");
 }
 
-export async function getTodo(task: string): Promise<Todo | undefined> {
+export async function getTodo(id: string): Promise<Todo | undefined> {
   const todos = await getTodos();
 
-  const todo = todos.find((todo) => task === todo.task);
+  const todo = todos.find((todo) => id === todo.id);
 
   return todo;
 }
 
 export async function updateTodo(
-  task: string,
+  id: string,
   todo: Partial<Todo>
 ): Promise<void> {
   const todos = await getTodos();
 
-  const todoindex = todos.findIndex((todo) => task === todo.task);
+  const todoindex = todos.findIndex((todo) => id === todo.id);
 
   const newTodo = {
     ...todos[todoindex],
@@ -59,20 +60,33 @@ export async function updateTodo(
   save("todos", todos);
 }
 
-export async function deleteTodo(task: string) {
+export async function deleteTodo(id: string) {
   const todos = await getTodos();
 
   save(
     "todos",
-    todos.filter((todo) => task !== todo.task)
+    todos.filter((todo) => id !== todo.id)
   );
 }
 
-// export async function duplicateTodo(task: string) {
-//   const todo = await getTodo(task);
+export async function duplicateTodo(id: string) {
+  const todos = await getTodos();
 
-//   addTodo(todo!);
-// }
+  const todoindex = todos.findIndex((todo) => id === todo.id);
+  const todo = todos[todoindex];
+
+  const newTodo = {
+    ...todo,
+    id: Math.random().toString(),
+    task: todo.task + " - Copy",
+  };
+
+  save("todos", [
+    ...todos.slice(0, todoindex + 1),
+    newTodo,
+    ...todos.slice(todoindex + 1),
+  ]);
+}
 
 export async function removeAll() {
   save("todos", []);

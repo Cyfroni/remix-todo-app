@@ -4,7 +4,13 @@ import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
-import { addTodo, deleteTodo, getTodo, getTodos } from "~/models/Todo.server";
+import {
+  addTodo,
+  deleteTodo,
+  duplicateTodo,
+  getTodo,
+  getTodos,
+} from "~/models/Todo.server";
 import { Box, TodolistItem } from "./index";
 
 type LoaderData = {
@@ -19,9 +25,9 @@ export const loader: LoaderFunction = async () => {
 export const action: ActionFunction = async ({ request }) => {
   const data = await request.formData();
 
-  const task = data.get("task");
+  const id = data.get("id");
 
-  invariant(typeof task === "string", "Task must be a string");
+  invariant(typeof id === "string", "Id must be a string");
 
   try {
     // if (Math.random() > 0.5) throw new Error("boom!");
@@ -31,15 +37,8 @@ export const action: ActionFunction = async ({ request }) => {
 
   const intent = data.get("intent");
 
-  if (intent === "delete") deleteTodo(task);
-  if (intent === "duplicate") {
-    const todo = await getTodo(task);
-    invariant(todo, "Todo is required");
-    await addTodo({
-      ...todo,
-      task: todo.task + " - Copy#" + Math.random(),
-    });
-  }
+  if (intent === "delete") deleteTodo(id);
+  if (intent === "duplicate") duplicateTodo(id);
 
   return null;
 };
@@ -51,15 +50,23 @@ export default function Index() {
     <Box>
       <h1>{tasks.length > 0 ? "Things you should do:" : "Nothing to do ⛱"}</h1>
       <ul>
-        {tasks.map(({ task }, index) => (
-          <TodoElem task={task} index={index} key={task} />
+        {tasks.map(({ task, id }, index) => (
+          <TodoElem task={task} index={index} key={id} id={id} />
         ))}
       </ul>
     </Box>
   );
 }
 
-function TodoElem({ task, index }: { task: string; index: number }) {
+function TodoElem({
+  task,
+  index,
+  id,
+}: {
+  task: string;
+  index: number;
+  id: string;
+}) {
   const fetcher = useFetcher();
   const actionData = fetcher.data;
 
@@ -75,11 +82,11 @@ function TodoElem({ task, index }: { task: string; index: number }) {
   return (
     <>
       <TodolistItem>
-        <Link to={`todo/${task}`}>
+        <Link to={`todo/${id}`}>
           {index + 1}. {task}
         </Link>
         <fetcher.Form method="delete">
-          <input type="hidden" name="task" value={task} />
+          <input type="hidden" name="id" value={id} />
           <button type="submit" name="intent" value="delete">
             <FontAwesomeIcon icon={faTrash} />
             {actionData?.error && "retry"}
@@ -93,7 +100,7 @@ function TodoElem({ task, index }: { task: string; index: number }) {
       </TodolistItem>
       {isDuplicating && (
         <TodolistItem>
-          <Link to="#">#. {task}</Link>
+          <Link to="#">#. {task} - Copy</Link>
           <fetcher.Form method="delete">
             <button type="submit" disabled>
               <FontAwesomeIcon icon={faTrash} />

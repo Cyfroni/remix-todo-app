@@ -36,7 +36,7 @@ export const action: ActionFunction = async ({ request }) => {
   invariant(typeof description === "string", "Description must be a string");
   invariant(typeof deadline === "string", "Deadline must be a string");
 
-  addTodo({ task, description, deadline });
+  addTodo({ task, description, deadline, id: Math.random().toString() });
 
   return redirect("todos");
 };

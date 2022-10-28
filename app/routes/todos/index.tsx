@@ -13,9 +13,16 @@ import {
   useLoaderData,
   useTransition,
 } from "@remix-run/react";
+import { FidgetSpinner } from "react-loader-spinner";
 import styled from "styled-components";
 import invariant from "tiny-invariant";
-import { addTodo, deleteTodo, getTodo, getTodos } from "~/models/Todo.server";
+import {
+  addTodo,
+  deleteTodo,
+  duplicateTodo,
+  getTodo,
+  getTodos,
+} from "~/models/Todo.server";
 
 export const headers: HeadersFunction = ({ loaderHeaders }) => {
   return {
@@ -39,21 +46,14 @@ export const loader: LoaderFunction = async () => {
 export const action: ActionFunction = async ({ request }) => {
   const data = await request.formData();
 
-  const task = data.get("task");
+  const id = data.get("id");
 
-  invariant(typeof task === "string", "Task must be a string");
+  invariant(typeof id === "string", "Id must be a string");
 
   const intent = data.get("intent");
 
-  if (intent === "delete") deleteTodo(task);
-  if (intent === "duplicate") {
-    const todo = await getTodo(task);
-    invariant(todo, "Todo is required");
-    await addTodo({
-      ...todo,
-      task: todo.task + " - Copy#" + Math.random(),
-    });
-  }
+  if (intent === "delete") deleteTodo(id);
+  if (intent === "duplicate") duplicateTodo(id);
 
   return null;
 };
@@ -193,8 +193,8 @@ export default function Index() {
     <Box>
       <h1>{tasks.length > 0 ? "Things you should do:" : "Nothing to do ⛱"}</h1>
       <ul>
-        {tasks.map(({ task }, index) => (
-          <TodoElem task={task} index={index} key={task} />
+        {tasks.map(({ id, task }, index) => (
+          <TodoElem task={task} index={index} key={id} id={id} />
         ))}
       </ul>
     </Box>
@@ -255,7 +255,15 @@ export const TodolistItem = styled.li`
   }
 `;
 
-function TodoElem({ task, index }: { task: string; index: number }) {
+function TodoElem({
+  task,
+  index,
+  id,
+}: {
+  task: string;
+  index: number;
+  id: string;
+}) {
   const fetcher = useFetcher();
 
   const isDeleting = Boolean(
@@ -270,20 +278,38 @@ function TodoElem({ task, index }: { task: string; index: number }) {
   return (
     <TodolistItem>
       {/* <Link to={`todo/${task}`} prefetch="intent"> */}
-      <Link to={`todo/${task}`}>
+      <Link to={`todo/${id}`}>
         {index + 1}. {task}
       </Link>
       <fetcher.Form method="post">
-        <input type="hidden" name="task" value={task} />
+        <input type="hidden" name="id" value={id} />
         {isDeleting ? (
-          "deleting"
+          <FidgetSpinner
+            visible={true}
+            height="35"
+            width="35"
+            ariaLabel="dna-loading"
+            wrapperStyle={{}}
+            wrapperClass="dna-wrapper"
+            ballColors={["transparent", "transparent", "transparent"]}
+            backgroundColor="#F93943"
+          />
         ) : (
           <button type="submit" name="intent" value="delete">
             <FontAwesomeIcon icon={faTrash} />
           </button>
         )}
         {isDuplicating ? (
-          "duplicating"
+          <FidgetSpinner
+            visible={true}
+            height="35"
+            width="35"
+            ariaLabel="dna-loading"
+            wrapperStyle={{}}
+            wrapperClass="dna-wrapper"
+            ballColors={["transparent", "transparent", "transparent"]}
+            backgroundColor="#656839"
+          />
         ) : (
           <button type="submit" name="intent" value="duplicate">
             <FontAwesomeIcon icon={faCopy} />
