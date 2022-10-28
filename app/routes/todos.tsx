@@ -4,14 +4,14 @@ import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import styled from "styled-components";
 import { getTodos } from "~/models/Todo.server";
 
-// type LoaderData = {
-//   amount: number;
-// };
+type LoaderData = {
+  amount: number;
+};
 
-// export const loader: LoaderFunction = async () => {
-//   const todos = await getTodos();
-//   return json<LoaderData>({ amount: todos.length });
-// };
+export const loader: LoaderFunction = async () => {
+  const todos = await getTodos();
+  return json<LoaderData>({ amount: todos.length });
+};
 
 const Header = styled.header`
   display: flex;
@@ -53,16 +53,17 @@ const Number = styled.div`
 `;
 
 export default function Index() {
-  // const { amount } = useLoaderData() as LoaderData;
+  const { amount } = useLoaderData() as LoaderData;
 
   return (
     <>
       <Header>
         <Link to="/">home</Link>
         <Link to=".">todos</Link>
+        <Link to="oui">todos OUI</Link>
         <Link to="todo/new">create todo</Link>
         {ENV.ADMIN === "true" && <Link to="admin">admin</Link>}
-        {/* <Number>{amount}</Number> */}
+        <Number>{amount}</Number>
       </Header>
       <Outlet />
     </>

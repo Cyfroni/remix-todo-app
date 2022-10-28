@@ -6,7 +6,13 @@ import type {
   LoaderFunction,
 } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Form, Link, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  Link,
+  useFetcher,
+  useLoaderData,
+  useTransition,
+} from "@remix-run/react";
 import styled from "styled-components";
 import invariant from "tiny-invariant";
 import { addTodo, deleteTodo, getTodo, getTodos } from "~/models/Todo.server";
@@ -45,14 +51,14 @@ export const action: ActionFunction = async ({ request }) => {
     invariant(todo, "Todo is required");
     await addTodo({
       ...todo,
-      task: todo.task + " - Copy",
+      task: todo.task + " - Copy#" + Math.random(),
     });
   }
 
   return null;
 };
 
-const Box = styled.div`
+export const Box = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -143,6 +149,43 @@ const FormStyled = styled(Form)`
   }
 `;
 
+// export default function Index() {
+//   const { tasks } = useLoaderData() as LoaderData;
+//   const transition = useTransition();
+
+//   const isDeleting = Boolean(transition.submission);
+
+//   return (
+//     <Box>
+//       <h1>{tasks.length > 0 ? "Things you should do:" : "Nothing to do ⛱"}</h1>
+//       <ul>
+//         {tasks.map(({ task }, index) => (
+//           <li key={task}>
+//             {/* <Link to={`todo/${task}`} prefetch="intent"> */}
+//             <Link to={`todo/${task}`}>
+//               {index + 1}. {task}
+//             </Link>
+//             <FormStyled method="delete">
+//               <input type="hidden" name="task" value={task} />
+//               {isDeleting ? (
+//                 "deleting"
+//               ) : (
+//                 <button type="submit" name="intent" value="delete">
+//                   <FontAwesomeIcon icon={faTrash} />
+//                 </button>
+//               )}
+
+//               <button type="submit" name="intent" value="duplicate">
+//                 <FontAwesomeIcon icon={faCopy} />
+//               </button>
+//             </FormStyled>
+//           </li>
+//         ))}
+//       </ul>
+//     </Box>
+//   );
+// }
+
 export default function Index() {
   const { tasks } = useLoaderData() as LoaderData;
 
@@ -151,23 +194,102 @@ export default function Index() {
       <h1>{tasks.length > 0 ? "Things you should do:" : "Nothing to do ⛱"}</h1>
       <ul>
         {tasks.map(({ task }, index) => (
-          <li key={task}>
-            {/* <Link to={`todo/${task}`} prefetch="intent"> */}
-            <Link to={`todo/${task}`}>
-              {index + 1}. {task}
-            </Link>
-            <FormStyled method="delete">
-              <input type="hidden" name="task" value={task} />
-              <button type="submit" name="intent" value="delete">
-                <FontAwesomeIcon icon={faTrash} />
-              </button>
-              <button type="submit" name="intent" value="duplicate">
-                <FontAwesomeIcon icon={faCopy} />
-              </button>
-            </FormStyled>
-          </li>
+          <TodoElem task={task} index={index} key={task} />
         ))}
       </ul>
     </Box>
+  );
+}
+
+export const TodolistItem = styled.li`
+  form {
+    margin-left: 1rem;
+    display: flex;
+    button {
+      background-color: transparent;
+      border: none;
+      color: white;
+      padding: 0.25rem 0;
+
+      display: block;
+      border-bottom: 1px solid transparent;
+
+      height: 3.5rem;
+      width: 3.5rem;
+
+      transition: all 0.3s;
+
+      color: ${({ theme }) => theme.colors.grey};
+
+      &:not(:disabled) {
+        cursor: pointer;
+
+        color: ${({ theme }) => theme.colors.error};
+
+        &:hover {
+          color: ${({ theme }) => theme.colors.error_lighter};
+        }
+
+        &:focus {
+          outline: none;
+          border-bottom: 1px solid ${({ theme }) => theme.colors.error_lighter};
+        }
+
+        &[value="duplicate"] {
+          color: #656839;
+
+          &:hover {
+            color: #737641;
+          }
+
+          &:focus {
+            border-bottom: 1px solid #737641;
+          }
+        }
+      }
+
+      svg {
+        height: 100%;
+      }
+    }
+  }
+`;
+
+function TodoElem({ task, index }: { task: string; index: number }) {
+  const fetcher = useFetcher();
+
+  const isDeleting = Boolean(
+    fetcher.submission?.formData.get("intent") === "delete"
+  );
+  const isDuplicating = Boolean(
+    fetcher.submission?.formData.get("intent") === "duplicate"
+  );
+
+  // const FetcherFormStyled = styleForm(fetcher.Form);
+
+  return (
+    <TodolistItem>
+      {/* <Link to={`todo/${task}`} prefetch="intent"> */}
+      <Link to={`todo/${task}`}>
+        {index + 1}. {task}
+      </Link>
+      <fetcher.Form method="post">
+        <input type="hidden" name="task" value={task} />
+        {isDeleting ? (
+          "deleting"
+        ) : (
+          <button type="submit" name="intent" value="delete">
+            <FontAwesomeIcon icon={faTrash} />
+          </button>
+        )}
+        {isDuplicating ? (
+          "duplicating"
+        ) : (
+          <button type="submit" name="intent" value="duplicate">
+            <FontAwesomeIcon icon={faCopy} />
+          </button>
+        )}
+      </fetcher.Form>
+    </TodolistItem>
   );
 }
