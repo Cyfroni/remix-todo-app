@@ -69,7 +69,7 @@ export async function deleteTodo(id: string) {
   );
 }
 
-export async function duplicateTodo(id: string) {
+export async function duplicateTodo(id: string, newId?: string) {
   const todos = await getTodos();
 
   const todoindex = todos.findIndex((todo) => id === todo.id);
@@ -77,7 +77,7 @@ export async function duplicateTodo(id: string) {
 
   const newTodo = {
     ...todo,
-    id: Math.random().toString(),
+    id: newId ?? Math.random().toString(),
     task: todo.task + " - Copy",
   };
 

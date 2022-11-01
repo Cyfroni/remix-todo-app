@@ -14,7 +14,7 @@ import {
   useTransition,
 } from "@remix-run/react";
 import { FidgetSpinner } from "react-loader-spinner";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import invariant from "tiny-invariant";
 import {
   addTodo,
@@ -69,7 +69,7 @@ export const Box = styled.div`
   ul {
     list-style: none;
 
-    li {
+    /* li {
       display: flex;
       align-items: center;
       margin-top: 1rem;
@@ -98,7 +98,7 @@ export const Box = styled.div`
       &:hover {
         background-color: ${({ theme }) => theme.colors.main_lighter};
       }
-    }
+    } */
   }
 `;
 
@@ -201,7 +201,41 @@ export default function Index() {
   );
 }
 
-export const TodolistItem = styled.li`
+export const TodolistItem = styled.li<{ optimistic?: boolean }>`
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+
+  a,
+  span {
+    flex: 1;
+    color: white;
+    text-decoration: none;
+    padding: 1rem 2rem;
+    border-radius: 5px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    background-color: ${({ theme }) => theme.colors.grey};
+  }
+
+  a {
+    background-color: ${({ theme }) => theme.colors.main};
+    transition: all 0.3s;
+
+    &:focus,
+    &:hover {
+      outline: none;
+      box-shadow: 0 0 5px ${({ theme }) => theme.colors.main_lighter};
+    }
+
+    &:hover {
+      background-color: ${({ theme }) => theme.colors.main_lighter};
+    }
+  }
+
   form {
     margin-left: 1rem;
     display: flex;
@@ -220,6 +254,8 @@ export const TodolistItem = styled.li`
       transition: all 0.3s;
 
       color: ${({ theme }) => theme.colors.grey};
+
+      visibility: ${({ optimistic }) => optimistic && "hidden"};
 
       &:not(:disabled) {
         cursor: pointer;
@@ -247,10 +283,10 @@ export const TodolistItem = styled.li`
           }
         }
       }
+    }
 
-      svg {
-        height: 100%;
-      }
+    svg {
+      height: 100%;
     }
   }
 `;

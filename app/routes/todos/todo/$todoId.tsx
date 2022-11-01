@@ -45,7 +45,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   updateTodo(id, { description });
 
-  return redirect("todos");
+  return redirect("/todos");
 };
 
 type LoaderData = Todo;

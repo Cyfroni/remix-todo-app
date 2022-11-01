@@ -1,16 +1,22 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Link, Outlet, useFetchers, useLoaderData } from "@remix-run/react";
 import styled from "styled-components";
-import { getTodos } from "~/models/Todo.server";
+import { getTodos, Todo } from "~/models/Todo.server";
+import useTodoCount from "~/utils/useTodoCount";
+import useOptimisticTodos from "~/utils/useTodoCount";
 
+// type LoaderData = {
+//   amount: number;
+// };
 type LoaderData = {
-  amount: number;
+  todos: Todo[];
 };
 
 export const loader: LoaderFunction = async () => {
   const todos = await getTodos();
-  return json<LoaderData>({ amount: todos.length });
+  // return json<LoaderData>({ amount: todos.length });
+  return json<LoaderData>({ todos });
 };
 
 const Header = styled.header`
@@ -53,7 +59,8 @@ const Number = styled.div`
 `;
 
 export default function Index() {
-  const { amount } = useLoaderData() as LoaderData;
+  const { todos } = useLoaderData() as LoaderData;
+  // const todoCount = useTodoCount(todos);
 
   return (
     <>
@@ -63,7 +70,7 @@ export default function Index() {
         <Link to="oui">todos OUI</Link>
         <Link to="todo/new">create todo</Link>
         {ENV.ADMIN === "true" && <Link to="admin">admin</Link>}
-        <Number>{amount}</Number>
+        {/* <Number>{todoCount}</Number> */}
       </Header>
       <Outlet />
     </>
