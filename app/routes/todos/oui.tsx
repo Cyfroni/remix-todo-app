@@ -1,43 +1,21 @@
 import { faCopy, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import {
-  FetcherWithComponents,
-  Link,
-  useFetcher,
-  useFetchers,
-  useLoaderData,
-} from "@remix-run/react";
-import { useEffect, useState } from "react";
+import type { ActionFunction } from "@remix-run/node";
+import type { FetcherWithComponents } from "@remix-run/react";
+import { Link, useFetcher } from "@remix-run/react";
 import invariant from "tiny-invariant";
-import {
-  addTodo,
-  deleteTodo,
-  duplicateTodo,
-  getTodo,
-  getTodos,
-} from "~/models/Todo.server";
-import useTodoCount from "~/utils/useTodoCount";
-import useOptimisticTodos from "~/utils/useTodoCount";
+import { deleteTodo, duplicateTodo } from "~/models/Todo.server";
+import { useTodos } from "../todos";
 import { Box, TodolistItem } from "./index";
 
-type LoaderData = {
-  todos: Awaited<ReturnType<typeof getTodos>>;
-};
-
-export const loader: LoaderFunction = async () => {
-  const todos = await getTodos();
-  return json<LoaderData>({ todos });
-};
-
 export const action: ActionFunction = async ({ request }) => {
-  // console.log(request);
   const data = await request.formData();
 
   const id = data.get("id");
+  const newId = data.get("newId");
 
   invariant(typeof id === "string", "Id must be a string");
+  invariant(typeof newId === "string", "NewId must be a string");
 
   try {
     // if (Math.random() > 0.5) throw new Error("boom!");
@@ -48,20 +26,19 @@ export const action: ActionFunction = async ({ request }) => {
   const intent = data.get("intent");
 
   if (intent === "delete") deleteTodo(id);
-  if (intent === "duplicate") duplicateTodo(id);
+  if (intent === "duplicate") duplicateTodo(id, newId);
 
   return null;
 };
 
 export default function Index() {
-  const { todos } = useLoaderData() as LoaderData;
-
-  const count = useTodoCount(todos);
+  const { todos, todoCount } = useTodos();
 
   return (
     <Box>
       <h1>
-        {count > 0 ? "Things you should do:" : "Nothing to do ⛱"} {count}
+        {todoCount > 0 ? "Things you should do:" : "Nothing to do ⛱"}{" "}
+        {todoCount}
       </h1>
       <ul>
         {todos.map(({ task, id }, index) => (
@@ -126,26 +103,33 @@ function TodoRowElem({
   id,
   task,
   fetcher,
+  optimistic,
 }: {
   id?: string;
   task: string;
   fetcher: FetcherWithComponents<any>;
+  optimistic?: boolean;
 }) {
   const actionData = fetcher.data;
   const isSubmitting = Boolean(fetcher.submission);
 
+  const { todos } = useTodos();
+
+  if (optimistic && todos.find((t) => t.id === id)) return null;
+
   return (
-    <TodolistItem optimistic={!id}>
-      {id ? (
+    <TodolistItem optimistic={optimistic}>
+      {optimistic ? (
+        <span>{task}</span>
+      ) : (
         <Link to={`todo/${id}`}>
           {/* {index + 1}. {task} */}
           {task}
         </Link>
-      ) : (
-        <span>{task}</span>
       )}
       <fetcher.Form method="post">
         <input type="hidden" name="id" value={id} />
+        <input type="hidden" name="newId" value={Math.random().toString()} />
         <button
           type="submit"
           name="intent"
@@ -192,7 +176,14 @@ function TodoElem({
     <>
       {!isDeleting && <TodoRowElem id={id} task={task} fetcher={fetcher} />}
       {isDuplicating && (
-        <TodoRowElem task={task + " - Copy"} fetcher={fetcher} />
+        <TodoRowElem
+          id={
+            fetcher.submission?.formData.get("newId")?.toString() || undefined
+          }
+          task={task + " - Copy"}
+          fetcher={fetcher}
+          optimistic
+        />
       )}
     </>
   );

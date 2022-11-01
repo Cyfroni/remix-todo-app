@@ -1,6 +1,8 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useFetchers, useLoaderData } from "@remix-run/react";
+import React from "react";
+import { useContext } from "react";
 import styled from "styled-components";
 import { getTodos, Todo } from "~/models/Todo.server";
 import useTodoCount from "~/utils/useTodoCount";
@@ -58,9 +60,13 @@ const Number = styled.div`
   margin-right: 1rem;
 `;
 
+const TodosContext = React.createContext({ todos: [] as Todo[], todoCount: 0 });
+
+export const useTodos = () => useContext(TodosContext);
+
 export default function Index() {
   const { todos } = useLoaderData() as LoaderData;
-  // const todoCount = useTodoCount(todos);
+  const todoCount = useTodoCount(todos);
 
   return (
     <>
@@ -72,7 +78,9 @@ export default function Index() {
         {ENV.ADMIN === "true" && <Link to="admin">admin</Link>}
         {/* <Number>{todoCount}</Number> */}
       </Header>
-      <Outlet />
+      <TodosContext.Provider value={{ todos, todoCount }}>
+        <Outlet />
+      </TodosContext.Provider>
     </>
   );
 }
