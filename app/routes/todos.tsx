@@ -1,23 +1,18 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Link, Outlet, useFetchers, useLoaderData } from "@remix-run/react";
-import React from "react";
-import { useContext } from "react";
+import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import React, { useContext } from "react";
 import styled from "styled-components";
-import { getTodos, Todo } from "~/models/Todo.server";
+import type { Todo } from "~/models/Todo.server";
+import { getTodos } from "~/models/Todo.server";
 import useTodoCount from "~/utils/useTodoCount";
-import useOptimisticTodos from "~/utils/useTodoCount";
 
-// type LoaderData = {
-//   amount: number;
-// };
 type LoaderData = {
   todos: Todo[];
 };
 
 export const loader: LoaderFunction = async () => {
   const todos = await getTodos();
-  // return json<LoaderData>({ amount: todos.length });
   return json<LoaderData>({ todos });
 };
 
@@ -76,7 +71,7 @@ export default function Index() {
         <Link to="oui">todos OUI</Link>
         <Link to="todo/new">create todo</Link>
         {ENV.ADMIN === "true" && <Link to="admin">admin</Link>}
-        {/* <Number>{todoCount}</Number> */}
+        <Number>{todoCount}</Number>
       </Header>
       <TodosContext.Provider value={{ todos, todoCount }}>
         <Outlet />
