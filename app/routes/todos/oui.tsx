@@ -17,13 +17,14 @@ export const action: ActionFunction = async ({ request }) => {
   invariant(typeof id === "string", "Id must be a string");
   invariant(typeof newId === "string", "NewId must be a string");
 
+  const intent = data.get("intent");
+
   try {
     // if (Math.random() > 0.5) throw new Error("boom!");
+    // throw new Error("boom!");
   } catch (e) {
-    return { error: true };
+    return { error: intent };
   }
-
-  const intent = data.get("intent");
 
   if (intent === "delete") deleteTodo(id);
   if (intent === "duplicate") duplicateTodo(id, newId);
@@ -137,7 +138,7 @@ function TodoRowElem({
           disabled={isSubmitting}
         >
           <FontAwesomeIcon icon={faTrash} />
-          {actionData?.error && "retry"}
+          {!isSubmitting && actionData?.error === "delete" && "retry"}
         </button>
 
         <button
@@ -147,7 +148,7 @@ function TodoRowElem({
           disabled={isSubmitting}
         >
           <FontAwesomeIcon icon={faCopy} />
-          {actionData?.error && "retry"}
+          {!isSubmitting && actionData?.error === "duplicate" && "retry"}
         </button>
       </fetcher.Form>
     </TodolistItem>
