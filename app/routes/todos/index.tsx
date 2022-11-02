@@ -6,23 +6,11 @@ import type {
   LoaderFunction,
 } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import {
-  Form,
-  Link,
-  useFetcher,
-  useLoaderData,
-  useTransition,
-} from "@remix-run/react";
+import { Form, Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { FidgetSpinner } from "react-loader-spinner";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import invariant from "tiny-invariant";
-import {
-  addTodo,
-  deleteTodo,
-  duplicateTodo,
-  getTodo,
-  getTodos,
-} from "~/models/Todo.server";
+import { deleteTodo, duplicateTodo, getTodos } from "~/models/Todo.server";
 
 export const headers: HeadersFunction = ({ loaderHeaders }) => {
   return {

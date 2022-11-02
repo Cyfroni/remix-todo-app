@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { ActionFunction } from "@remix-run/node";
 import type { FetcherWithComponents } from "@remix-run/react";
 import { Link, useFetcher } from "@remix-run/react";
+import { useEffect, useState } from "react";
 import invariant from "tiny-invariant";
 import { deleteTodo, duplicateTodo } from "~/models/Todo.server";
 import { useTodos } from "../todos";
@@ -12,10 +13,8 @@ export const action: ActionFunction = async ({ request }) => {
   const data = await request.formData();
 
   const id = data.get("id");
-  const newId = data.get("newId");
 
   invariant(typeof id === "string", "Id must be a string");
-  invariant(typeof newId === "string", "NewId must be a string");
 
   const intent = data.get("intent");
 
@@ -26,8 +25,15 @@ export const action: ActionFunction = async ({ request }) => {
     return { error: intent };
   }
 
-  if (intent === "delete") deleteTodo(id);
-  if (intent === "duplicate") duplicateTodo(id, newId);
+  if (intent === "delete") {
+    deleteTodo(id);
+    return { deleted: id };
+  }
+  if (intent === "duplicate") {
+    const newId = Math.random().toString();
+    duplicateTodo(id, newId);
+    return { duplicated: { newId, oldId: id } };
+  }
 
   return null;
 };
@@ -129,8 +135,7 @@ function TodoRowElem({
         </Link>
       )}
       <fetcher.Form method="post">
-        <input type="hidden" name="id" value={id} />
-        <input type="hidden" name="newId" value={Math.random().toString()} />
+        <input type="hidden" name="id" value={id ?? ""} />
         <button
           type="submit"
           name="intent"
@@ -173,14 +178,19 @@ function TodoElem({
     fetcher.submission?.formData.get("intent") === "duplicate"
   );
 
+  const [newId, setNewId] = useState();
+
+  useEffect(() => {
+    if (fetcher.state === "idle") setNewId(undefined);
+    if (fetcher.state === "loading") setNewId(fetcher.data?.duplicated?.newId);
+  }, [fetcher]);
+
   return (
     <>
       {!isDeleting && <TodoRowElem id={id} task={task} fetcher={fetcher} />}
       {isDuplicating && (
         <TodoRowElem
-          id={
-            fetcher.submission?.formData.get("newId")?.toString() || undefined
-          }
+          id={newId}
           task={task + " - Copy"}
           fetcher={fetcher}
           optimistic
