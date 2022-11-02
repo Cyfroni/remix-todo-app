@@ -201,12 +201,21 @@ function TodoElem({
   const isDuplicating = Boolean(duplicationFetcher.submission);
   const duplicationError = duplicationFetcher.data?.error;
 
-  const [newId, setNewId] = useState();
+  // const [newId, setNewId] = useState();
+  // useEffect(() => {
+  //   if (duplicationFetcher.state === "idle") setNewId(undefined);
+  //   if (duplicationFetcher.state === "loading")
+  //     setNewId(duplicationFetcher.data?.duplicated?.newId);
+  // }, [duplicationFetcher]);
+
+  const [newIds, setNewIds] = useState([] as string[]);
+
+  console.log(duplicationFetcher);
 
   useEffect(() => {
-    if (duplicationFetcher.state === "idle") setNewId(undefined);
+    if (duplicationFetcher.state === "idle") setNewIds([]);
     if (duplicationFetcher.state === "loading")
-      setNewId(duplicationFetcher.data?.duplicated?.newId);
+      setNewIds((ids) => [...ids, duplicationFetcher.data?.duplicated?.newId]);
   }, [duplicationFetcher]);
 
   return (
@@ -219,14 +228,9 @@ function TodoElem({
           </Link>
           <deleteFetcher.Form method="delete">
             <input type="hidden" name="id" value={id} />
-            <button
-              type="submit"
-              name="intent"
-              value="delete"
-              disabled={isDeleting}
-            >
+            <button type="submit" name="intent" value="delete">
               <FontAwesomeIcon icon={faTrash} />
-              {!isDeleting && deletionError && "retry"}
+              {deletionError && "retry"}
             </button>
           </deleteFetcher.Form>
           <duplicationFetcher.Form method="post">
@@ -235,8 +239,8 @@ function TodoElem({
               type="submit"
               name="intent"
               value="duplicate"
-              // disabled={duplicationFetcher.state === "submitting"}
-              disabled={isDuplicating}
+              disabled={duplicationFetcher.state === "submitting"}
+              // disabled={isDuplicating}
             >
               <FontAwesomeIcon icon={faCopy} />
               {!isDuplicating && duplicationError && "retry"}
@@ -244,9 +248,12 @@ function TodoElem({
           </duplicationFetcher.Form>
         </TodolistItem>
       )}
-      {isDuplicating && (
-        <OptimisticTodoElem id={newId} task={task + " - Copy"} />
+      {duplicationFetcher.state === "submitting" && (
+        <OptimisticTodoElem task={task + " - Copy"} />
       )}
+      {newIds.map((nId) => (
+        <OptimisticTodoElem key={nId} id={nId} task={task + " - Copy"} />
+      ))}
     </>
   );
 }
