@@ -1,7 +1,6 @@
 import { faCopy, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { ActionFunction } from "@remix-run/node";
-import type { FetcherWithComponents } from "@remix-run/react";
 import { Link, useFetcher } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import invariant from "tiny-invariant";
@@ -22,7 +21,8 @@ export const action: ActionFunction = async ({ request }) => {
     // if (Math.random() > 0.5) throw new Error("boom!");
     // throw new Error("boom!");
   } catch (e) {
-    return { error: intent };
+    // return { error: intent };
+    return { error: true };
   }
 
   if (intent === "delete") {
@@ -106,59 +106,83 @@ export default function Index() {
 //   );
 // }
 
-function TodoRowElem({
-  id,
-  task,
-  fetcher,
-  optimistic,
-}: {
-  id?: string;
-  task: string;
-  fetcher: FetcherWithComponents<any>;
-  optimistic?: boolean;
-}) {
-  const actionData = fetcher.data;
-  const isSubmitting = Boolean(fetcher.submission);
-
+function OptimisticTodoElem({ id, task }: { id?: string; task: string }) {
   const { todos } = useTodos();
 
-  if (optimistic && todos.find((t) => t.id === id)) return null;
+  if (todos.find((t) => t.id === id)) return null;
 
   return (
-    <TodolistItem optimistic={optimistic}>
-      {optimistic ? (
-        <span>{task}</span>
-      ) : (
-        <Link to={`todo/${id}`}>
-          {/* {index + 1}. {task} */}
-          {task}
-        </Link>
-      )}
-      <fetcher.Form method="post">
-        <input type="hidden" name="id" value={id ?? ""} />
-        <button
-          type="submit"
-          name="intent"
-          value="delete"
-          disabled={isSubmitting}
-        >
+    <TodolistItem optimistic={true}>
+      <span>{task}</span>
+      {/* <form method="delete">
+        <button type="submit" name="intent" value="delete">
           <FontAwesomeIcon icon={faTrash} />
-          {!isSubmitting && actionData?.error === "delete" && "retry"}
         </button>
-
-        <button
-          type="submit"
-          name="intent"
-          value="duplicate"
-          disabled={isSubmitting}
-        >
+      </form>
+      <form method="post">
+        <button type="submit" name="intent" value="duplicate">
           <FontAwesomeIcon icon={faCopy} />
-          {!isSubmitting && actionData?.error === "duplicate" && "retry"}
         </button>
-      </fetcher.Form>
+      </form> */}
     </TodolistItem>
   );
 }
+
+// function TodoRowElem({
+//   id,
+//   task,
+//   fetcher,
+//   optimistic,
+// }: {
+//   id?: string;
+//   task: string;
+//   fetcher: FetcherWithComponents<any>;
+//   optimistic?: boolean;
+// }) {
+//   // const actionData = fetcher.data;
+//   // const isSubmitting = Boolean(fetcher.submission);
+
+//   const deleteFetcher = useFetcher();
+
+//   if (deleteFetcher.submission) return null;
+
+//   return (
+//     <TodolistItem optimistic={optimistic}>
+//       {optimistic ? (
+//         <span>{task}</span>
+//       ) : (
+//         <Link to={`todo/${id}`}>
+//           {/* {index + 1}. {task} */}
+//           {task}
+//         </Link>
+//       )}
+//       <deleteFetcher.Form method="delete">
+//         <input type="hidden" name="id" value={id ?? ""} />
+//         <button
+//           type="submit"
+//           name="intent"
+//           value="delete"
+//           disabled={!!deleteFetcher.submission}
+//         >
+//           <FontAwesomeIcon icon={faTrash} />
+//           {!deleteFetcher.submission && deleteFetcher.data?.error && "retry"}
+//         </button>
+//       </deleteFetcher.Form>
+//       <fetcher.Form method="post">
+//         <input type="hidden" name="id" value={id ?? ""} />
+//         <button
+//           type="submit"
+//           name="intent"
+//           value="duplicate"
+//           disabled={!!fetcher.submission}
+//         >
+//           <FontAwesomeIcon icon={faCopy} />
+//           {!fetcher.submission && fetcher.data?.error && "retry"}
+//         </button>
+//       </fetcher.Form>
+//     </TodolistItem>
+//   );
+// }
 
 function TodoElem({
   task,
@@ -169,32 +193,59 @@ function TodoElem({
   index: number;
   id: string;
 }) {
-  const fetcher = useFetcher();
+  const deleteFetcher = useFetcher();
+  const duplicationFetcher = useFetcher();
 
-  const isDeleting = Boolean(
-    fetcher.submission?.formData.get("intent") === "delete"
-  );
-  const isDuplicating = Boolean(
-    fetcher.submission?.formData.get("intent") === "duplicate"
-  );
+  const isDeleting = Boolean(deleteFetcher.submission);
+  const deletionError = deleteFetcher.data?.error;
+  const isDuplicating = Boolean(duplicationFetcher.submission);
+  const duplicationError = duplicationFetcher.data?.error;
 
   const [newId, setNewId] = useState();
 
   useEffect(() => {
-    if (fetcher.state === "idle") setNewId(undefined);
-    if (fetcher.state === "loading") setNewId(fetcher.data?.duplicated?.newId);
-  }, [fetcher]);
+    if (duplicationFetcher.state === "idle") setNewId(undefined);
+    if (duplicationFetcher.state === "loading")
+      setNewId(duplicationFetcher.data?.duplicated?.newId);
+  }, [duplicationFetcher]);
 
   return (
     <>
-      {!isDeleting && <TodoRowElem id={id} task={task} fetcher={fetcher} />}
+      {!isDeleting && (
+        <TodolistItem>
+          <Link to={`todo/${id}`}>
+            {/* {index + 1}. {task} */}
+            {task}
+          </Link>
+          <deleteFetcher.Form method="delete">
+            <input type="hidden" name="id" value={id} />
+            <button
+              type="submit"
+              name="intent"
+              value="delete"
+              disabled={isDeleting}
+            >
+              <FontAwesomeIcon icon={faTrash} />
+              {!isDeleting && deletionError && "retry"}
+            </button>
+          </deleteFetcher.Form>
+          <duplicationFetcher.Form method="post">
+            <input type="hidden" name="id" value={id} />
+            <button
+              type="submit"
+              name="intent"
+              value="duplicate"
+              // disabled={duplicationFetcher.state === "submitting"}
+              disabled={isDuplicating}
+            >
+              <FontAwesomeIcon icon={faCopy} />
+              {!isDuplicating && duplicationError && "retry"}
+            </button>
+          </duplicationFetcher.Form>
+        </TodolistItem>
+      )}
       {isDuplicating && (
-        <TodoRowElem
-          id={newId}
-          task={task + " - Copy"}
-          fetcher={fetcher}
-          optimistic
-        />
+        <OptimisticTodoElem id={newId} task={task + " - Copy"} />
       )}
     </>
   );
