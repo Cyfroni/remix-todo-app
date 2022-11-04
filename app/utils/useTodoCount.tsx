@@ -3,7 +3,7 @@ import type { Todo } from "~/models/Todo.server";
 
 export default function useTodoCount(todos: Todo[]): number {
   const fetchers = useFetchers();
-  let completedTasks = 0;
+  let todoCount = todos.length;
 
   const myFetchers = new Map();
   for (const f of fetchers) {
@@ -12,7 +12,7 @@ export default function useTodoCount(todos: Todo[]): number {
       if (myFetchers.has(taskId)) {
         myFetchers.get(taskId).push(f);
       } else {
-        myFetchers.set(taskId, [f]);
+        myFetchers.set(taskId, [f]); // delete or duplicate
       }
     }
   }
@@ -24,17 +24,16 @@ export default function useTodoCount(todos: Todo[]): number {
         const actionData = fetcher.data;
         const intent = formData.get("intent");
         if (intent === "duplicate") {
-          if (fetcher.state === "submitting") completedTasks++;
+          if (fetcher.state === "submitting") todoCount++;
           else {
             const newId = actionData?.duplicated?.newId;
-            if (!todos.find(({ id }) => id === newId)) completedTasks++;
+            if (!todos.find(({ id }) => id === newId)) todoCount++;
           }
         }
-        if (intent === "delete") completedTasks--;
+        if (intent === "delete") todoCount--;
       }
     }
-    completedTasks++;
   }
 
-  return completedTasks;
+  return todoCount;
 }

@@ -64,18 +64,30 @@ function OptimisticTodoElem({
   task: string;
 }) {
   const fetcher = useFetcher();
+  const { todos } = useTodos();
+  const id = fetcher.data?.duplicated?.newId;
+
+  // const duplicate = () => fetcher.submit({ id: originId, intent: "duplicate" }, { method: "post" });
 
   useEffect(() => {
-    fetcher.submit({ id: originId, intent: "duplicate" }, { method: "post" });
-  }, []);
+    console.log(fetcher);
+    if (fetcher.type === "init")
+      fetcher.submit({ id: originId, intent: "duplicate" }, { method: "post" });
+    if (fetcher.type === "done") {
+      // if (fetcher.data.error) console.log("error! ;v");
+      // todo: set error on parent
+      // else console.log("done!", fetcher.data?.duplicated?.newId);
+      console.log("done!", fetcher.data?.duplicated?.newId);
+      // todo: remove from parent
+    }
+  }, [fetcher, originId]);
 
-  const { todos } = useTodos();
-  const id = fetcher.data?.duplicated.newId;
   if (todos.find((t) => t.id === id)) return null;
 
   return (
     <TodolistItem optimistic={true}>
       <span>{task}</span>
+      {fetcher.data?.error && "failed"}
     </TodolistItem>
   );
 }
