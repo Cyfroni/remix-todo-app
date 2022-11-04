@@ -106,24 +106,26 @@ export default function Index() {
 //   );
 // }
 
-function OptimisticTodoElem({ id, task }: { id?: string; task: string }) {
-  const { todos } = useTodos();
+function OptimisticTodoElem({
+  originId,
+  task,
+}: {
+  originId: string;
+  task: string;
+}) {
+  const fetcher = useFetcher();
 
+  useEffect(() => {
+    fetcher.submit({ id: originId, intent: "duplicate" }, { method: "post" });
+  }, []);
+
+  const { todos } = useTodos();
+  const id = fetcher.data?.duplicated.newId;
   if (todos.find((t) => t.id === id)) return null;
 
   return (
     <TodolistItem optimistic={true}>
       <span>{task}</span>
-      {/* <form method="delete">
-        <button type="submit" name="intent" value="delete">
-          <FontAwesomeIcon icon={faTrash} />
-        </button>
-      </form>
-      <form method="post">
-        <button type="submit" name="intent" value="duplicate">
-          <FontAwesomeIcon icon={faCopy} />
-        </button>
-      </form> */}
     </TodolistItem>
   );
 }
@@ -208,15 +210,19 @@ function TodoElem({
   //     setNewId(duplicationFetcher.data?.duplicated?.newId);
   // }, [duplicationFetcher]);
 
-  const [newIds, setNewIds] = useState([] as string[]);
+  // const [newIds, setNewIds] = useState([] as string[]);
 
-  console.log(duplicationFetcher);
+  // console.log(duplicationFetcher);
 
-  useEffect(() => {
-    if (duplicationFetcher.state === "idle") setNewIds([]);
-    if (duplicationFetcher.state === "loading")
-      setNewIds((ids) => [...ids, duplicationFetcher.data?.duplicated?.newId]);
-  }, [duplicationFetcher]);
+  // useEffect(() => {
+  //   if (duplicationFetcher.state === "idle") setNewIds([]);
+  //   if (duplicationFetcher.state === "loading")
+  //     setNewIds((ids) => [...ids, duplicationFetcher.data?.duplicated?.newId]);
+  // }, [duplicationFetcher]);
+
+  const [copies, setCopies] = useState([] as object[]);
+
+  const doCopy = () => setCopies((cs) => [...cs, {}]);
 
   return (
     <>
@@ -233,7 +239,12 @@ function TodoElem({
               {deletionError && "retry"}
             </button>
           </deleteFetcher.Form>
-          <duplicationFetcher.Form method="post">
+          <FontAwesomeIcon
+            icon={faCopy}
+            onClick={doCopy}
+            style={{ width: "35px", height: "35px" }}
+          />
+          {/* <duplicationFetcher.Form method="post">
             <input type="hidden" name="id" value={id} />
             <button
               type="submit"
@@ -245,14 +256,18 @@ function TodoElem({
               <FontAwesomeIcon icon={faCopy} />
               {!isDuplicating && duplicationError && "retry"}
             </button>
-          </duplicationFetcher.Form>
+          </duplicationFetcher.Form> */}
         </TodolistItem>
       )}
-      {duplicationFetcher.state === "submitting" && (
+      {/* {duplicationFetcher.state === "submitting" && (
         <OptimisticTodoElem task={task + " - Copy"} />
       )}
       {newIds.map((nId) => (
         <OptimisticTodoElem key={nId} id={nId} task={task + " - Copy"} />
+      ))} */}
+
+      {copies.map((val, index) => (
+        <OptimisticTodoElem key={index} originId={id} task={task + " - Copy"} />
       ))}
     </>
   );
