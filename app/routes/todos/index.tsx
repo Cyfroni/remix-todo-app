@@ -72,14 +72,13 @@ function TodoElem({
 }) {
   const fetcher = useFetcher();
 
+  const isSubmitting = Boolean(fetcher.submission);
   const isDeleting = Boolean(
     fetcher.submission?.formData.get("intent") === "delete"
   );
   const isDuplicating = Boolean(
     fetcher.submission?.formData.get("intent") === "duplicate"
   );
-
-  // const FetcherFormStyled = styleForm(fetcher.Form);
 
   return (
     <TodolistItem>
@@ -101,7 +100,12 @@ function TodoElem({
             backgroundColor="#F93943"
           />
         ) : (
-          <button type="submit" name="intent" value="delete">
+          <button
+            type="submit"
+            name="intent"
+            value="delete"
+            disabled={isSubmitting}
+          >
             <FontAwesomeIcon icon={faTrash} />
           </button>
         )}
@@ -117,7 +121,12 @@ function TodoElem({
             backgroundColor="#656839"
           />
         ) : (
-          <button type="submit" name="intent" value="duplicate">
+          <button
+            type="submit"
+            name="intent"
+            value="duplicate"
+            disabled={isSubmitting}
+          >
             <FontAwesomeIcon icon={faCopy} />
           </button>
         )}
