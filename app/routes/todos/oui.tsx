@@ -4,9 +4,13 @@ import type { ActionFunction } from "@remix-run/node";
 import { Link, useFetcher } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import invariant from "tiny-invariant";
+import {
+  OptimisticTodolistItem,
+  TodolistItem,
+  TodosWrapper,
+} from "~/components/TodoList";
 import { deleteTodo, duplicateTodo } from "~/models/Todo.server";
 import { useTodos } from "../todos";
-import { Box, TodolistItem } from "./index";
 
 export const action: ActionFunction = async ({ request }) => {
   const data = await request.formData();
@@ -41,10 +45,10 @@ export default function Index() {
   const { todos, todoCount } = useTodos();
 
   return (
-    <Box>
+    <TodosWrapper>
       <h1>
-        {todoCount > 0 ? "Things you should do:" : "Nothing to do ⛱"}{" "}
-        {todoCount}
+        {todoCount > 0 ? "Things you should do:" : "Nothing to do ⛱"}
+        {/* {todoCount} */}
       </h1>
       <ul>
         {todos.map(({ task, id }, index) => (
@@ -52,7 +56,7 @@ export default function Index() {
           <TodoElem task={task} key={id} id={id} />
         ))}
       </ul>
-    </Box>
+    </TodosWrapper>
   );
 }
 
@@ -74,21 +78,26 @@ function OptimisticTodoElem({
     if (fetcher.type === "init")
       fetcher.submit({ id: originId, intent: "duplicate" }, { method: "post" });
     if (fetcher.type === "done") {
-      // if (fetcher.data.error) console.log("error! ;v");
-      // todo: set error on parent
-      // else console.log("done!", fetcher.data?.duplicated?.newId);
-      console.log("done!", fetcher.data?.duplicated?.newId);
-      // todo: remove from parent
+      if (!fetcher.data.error) {
+        console.log("done!", fetcher.data?.duplicated?.newId);
+        // todo: remove from parent
+      }
     }
   }, [fetcher, originId]);
 
   if (todos.find((t) => t.id === id)) return null;
 
   return (
-    <TodolistItem optimistic={true}>
+    <OptimisticTodolistItem>
       <span>{task}</span>
       {fetcher.data?.error && "failed"}
-    </TodolistItem>
+      <button type="submit" name="intent" value="delete" disabled>
+        <FontAwesomeIcon icon={faTrash} />
+      </button>
+      <button type="submit" name="intent" value="duplicate" disabled>
+        <FontAwesomeIcon icon={faCopy} />
+      </button>
+    </OptimisticTodolistItem>
   );
 }
 
@@ -125,11 +134,14 @@ function TodoElem({
               {deletionError && "retry"}
             </button>
           </deleteFetcher.Form>
-          <FontAwesomeIcon
-            icon={faCopy}
+          <button
+            type="submit"
+            name="intent"
+            value="duplicate"
             onClick={doCopy}
-            style={{ width: "35px", height: "35px" }}
-          />
+          >
+            <FontAwesomeIcon icon={faCopy} />
+          </button>
         </TodolistItem>
       )}
       {copies.map((val, index) => (
