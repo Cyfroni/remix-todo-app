@@ -74,7 +74,7 @@ function OptimisticTodoElem({
   // const duplicate = () => fetcher.submit({ id: originId, intent: "duplicate" }, { method: "post" });
 
   useEffect(() => {
-    console.log(fetcher);
+    // console.log(fetcher);
     if (fetcher.type === "init")
       fetcher.submit({ id: originId, intent: "duplicate" }, { method: "post" });
     if (fetcher.type === "done") {
@@ -97,6 +97,14 @@ function OptimisticTodoElem({
       <button type="submit" name="intent" value="duplicate" disabled>
         <FontAwesomeIcon icon={faCopy} />
       </button>
+      {/* <button
+        type="submit"
+        name="intent"
+        value="duplicate"
+        onClick={() => console.log(fetcher)}
+      >
+        info
+      </button> */}
     </OptimisticTodolistItem>
   );
 }

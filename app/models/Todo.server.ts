@@ -1,6 +1,7 @@
 import fs from "fs";
 
 async function save<T>(key: string, data: T[]): Promise<void> {
+  // console.log("saving", data);
   return new Promise((resolve, reject) => {
     fs.writeFile(__dirname + "/" + key, JSON.stringify(data), () => resolve());
   });

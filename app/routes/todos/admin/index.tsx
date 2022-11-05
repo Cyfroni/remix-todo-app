@@ -48,8 +48,6 @@ export default function Index() {
     if (transition.type === "actionReload") setDeleted(true);
   }, [transition]);
 
-  console.log(transition);
-
   return (
     <Box>
       <h1>What's up admin?</h1>

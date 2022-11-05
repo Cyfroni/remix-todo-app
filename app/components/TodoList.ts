@@ -90,6 +90,9 @@ export const TodolistItem = styled.li`
   svg {
     height: 100%;
   }
+  form {
+    display: flex;
+  }
 `;
 
 export const OptimisticTodolistItem = styled(TodolistItem)`

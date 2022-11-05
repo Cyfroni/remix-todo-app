@@ -5,6 +5,8 @@ export default function useTodoCount(todos: Todo[]): number {
   const fetchers = useFetchers();
   let todoCount = todos.length;
 
+  // console.log(fetchers);
+
   const myFetchers = new Map();
   for (const f of fetchers) {
     if (f.submission && f.submission.action.startsWith("/todos/oui")) {
