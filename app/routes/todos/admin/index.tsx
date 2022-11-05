@@ -45,8 +45,10 @@ export default function Index() {
   const transition = useTransition();
 
   useEffect(() => {
-    if (transition.state === "loading") setDeleted(true);
+    if (transition.type === "actionReload") setDeleted(true);
   }, [transition]);
+
+  console.log(transition);
 
   return (
     <Box>
