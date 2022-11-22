@@ -1,8 +1,4 @@
-import type {
-  ActionFunction,
-  HeadersFunction,
-  LoaderFunction,
-} from "@remix-run/node";
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Response } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
