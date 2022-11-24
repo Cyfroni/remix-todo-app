@@ -2,10 +2,17 @@ import type { LoaderFunction } from "@remix-run/node";
 import { Outlet, useCatch } from "@remix-run/react";
 import styled from "styled-components";
 
-export const loader: LoaderFunction = () => {
+function authorize() {
   if (process.env.ADMIN !== "true")
     throw new Response("Not an admin", { status: 403 });
+  const user = {};
+  return user;
+}
 
+export const loader: LoaderFunction = () => {
+  const user = authorize();
+
+  console.log(user);
   console.log(process.env.SECRET);
   return null;
 };
