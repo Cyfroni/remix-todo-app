@@ -1,34 +1,18 @@
 import { faCopy, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import type {
-  ActionFunction,
-  HeadersFunction,
-  LoaderFunction,
-} from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Link, useFetcher, useLoaderData } from "@remix-run/react";
+import type { ActionFunction, HeadersFunction } from "@remix-run/node";
+import { Link, useFetcher } from "@remix-run/react";
 import { FidgetSpinner } from "react-loader-spinner";
 import invariant from "tiny-invariant";
 import { TodolistItem, TodosWrapper } from "~/components/TodoList";
-import { deleteTodo, duplicateTodo, getTodos } from "~/models/Todo.server";
+import { deleteTodo, duplicateTodo } from "~/models/Todo.server";
+import { useTodos } from "../todos";
 
 export const headers: HeadersFunction = ({ loaderHeaders }) => {
   return {
     // "Cache-Control": `public, max-age=20`,
     // "Cache-Control": `no-cache, no-store, must-revalidate`,
   };
-};
-
-type LoaderData = {
-  tasks: Awaited<ReturnType<typeof getTodos>>;
-};
-
-export const loader: LoaderFunction = async () => {
-  const todos = await getTodos();
-  return json<LoaderData>(
-    { tasks: todos }
-    // { headers: { "Cache-Control": "public, max-age=10" } }
-  );
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -47,7 +31,7 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export default function Index() {
-  const { tasks } = useLoaderData() as LoaderData;
+  const { todos: tasks } = useTodos();
 
   return (
     <TodosWrapper>

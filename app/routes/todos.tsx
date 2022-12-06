@@ -66,11 +66,23 @@ export default function Index() {
   return (
     <>
       <Header>
-        <Link to="/">home</Link>
-        <Link to=".">todos</Link>
-        <Link to="oui">todos OUI</Link>
-        <Link to="todo/new">create todo</Link>
-        {ENV.ADMIN === "true" && <Link to="admin">admin</Link>}
+        <Link prefetch="intent" to="/">
+          home
+        </Link>
+        <Link prefetch="intent" to=".">
+          todos
+        </Link>
+        <Link prefetch="intent" to="oui">
+          todos OUI
+        </Link>
+        <Link prefetch="intent" to="todo/new">
+          create todo
+        </Link>
+        {ENV.ADMIN === "true" && (
+          <Link prefetch="intent" to="admin">
+            admin
+          </Link>
+        )}
         <Number>{todoCount}</Number>
       </Header>
       <TodosContext.Provider value={{ todos, todoCount }}>

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import invariant from "tiny-invariant";
 import { removeAll } from "~/models/Todo.server";
-import { ButtonStyled } from "../todo/new";
+import { DeleteButton } from "~/components/button";
 
 export const action: ActionFunction = ({ request }) => {
   invariant(process.env.ADMIN === "true", "You're not an admin");
@@ -18,21 +18,6 @@ const Box = styled.div`
   line-height: 1.4;
   text-align: center;
   margin-top: 5rem;
-`;
-
-const DeleteButton = styled(ButtonStyled)`
-  background-color: ${({ theme }) => theme.colors.error};
-  border: transparent;
-  &:not(:disabled) {
-    &:focus,
-    &:hover {
-      box-shadow: 0 0 5px ${({ theme }) => theme.colors.error_lighter};
-    }
-
-    &:hover {
-      background-color: ${({ theme }) => theme.colors.error_lighter};
-    }
-  }
 `;
 
 const DeletedText = styled.div`

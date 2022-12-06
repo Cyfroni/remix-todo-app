@@ -143,8 +143,8 @@ function TodoElem({
             </button>
           </deleteFetcher.Form>
           <button
-            type="submit"
-            name="intent"
+            // type="submit"
+            // name="intent"
             value="duplicate"
             onClick={doCopy}
           >

@@ -1,7 +1,5 @@
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Response } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
+import { json, redirect, Response } from "@remix-run/node";
 import {
   useActionData,
   useCatch,
@@ -14,7 +12,8 @@ import styled from "styled-components";
 import invariant from "tiny-invariant";
 import type { Todo } from "~/models/Todo.server";
 import { getTodo, updateTodo } from "~/models/Todo.server";
-import { ButtonStyled, FormStyled, SubmitButtonWithLoader } from "./new";
+import { ButtonStyled, SubmitButtonWithLoader } from "~/components/button";
+import { FormStyled } from "~/components/form";
 
 type ActionData =
   | {
